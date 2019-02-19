@@ -4,15 +4,8 @@ import com.squareup.kotlinpoet.*
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.springframework.web.bind.annotation.*
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.util.Collections.singleton
-import java.util.logging.Level.SEVERE
-import java.io.IOException
 import org.eclipse.jgit.api.errors.GitAPIException
-import org.eclipse.jgit.api.PullCommand
 import org.eclipse.jgit.internal.storage.file.FileRepository
 
 
@@ -31,16 +24,23 @@ class Generator {
 
 
     @RequestMapping("/register", method = [RequestMethod.GET])
-    fun register(
-//            @RequestParam(value = "name", defaultValue = "World") name: String
-    ): String {
+    fun register(): String {
+
+        prepareShell()
+        val classFile = generateClass()
+        writeClass(classFile)
 
 
-        val clientName = "ExampleClient"
+        return "done"
+
+    }
+
+    fun generateClass(): String {
+        val clientName = "Client"
         val endpointGET = setOf(
-                Endpoint("exampleEndpoint", RequestMethod.GET, listOf(Prop("name"), Prop("name2"))),
-                Endpoint("exampleEndpoint2", RequestMethod.GET, listOf(Prop("name"), Prop("Fico"))),
-                Endpoint("exampleEndpoint3", RequestMethod.GET, listOf(Prop("name")))
+                Endpoint("Endpoint", RequestMethod.GET, listOf(Prop("name"), Prop("name2"))),
+                Endpoint("Endpoint2", RequestMethod.GET, listOf(Prop("name"), Prop("Fico"))),
+                Endpoint("Endpoint3", RequestMethod.GET, listOf(Prop("name")))
         )
 
 
@@ -65,9 +65,9 @@ class Generator {
 
 
         val endpointPOST = setOf(
-                Endpoint("exampleEndpointPOST", RequestMethod.POST, listOf(Prop("name"), Prop("name2"))),
-                Endpoint("exampleEndpointPOST2", RequestMethod.POST, listOf(Prop("name"), Prop("Fico"))),
-                Endpoint("exampleEndpointPOST3", RequestMethod.POST, listOf(Prop("name")))
+                Endpoint("EndpointPOST", RequestMethod.POST, listOf(Prop("name"), Prop("name2"))),
+                Endpoint("EndpointPOST2", RequestMethod.POST, listOf(Prop("name"), Prop("Fico"))),
+                Endpoint("EndpointPOST3", RequestMethod.POST, listOf(Prop("name")))
         )
 
         val functions2 = endpointPOST.map { endpoint ->
@@ -95,16 +95,14 @@ class Generator {
                 .addAnnotation(RestController::class)
                 .build()
 
-        val fileSpec = FileSpec.builder("", clientName)
+        val fileSpec = FileSpec.builder("sk.knet.dp.endpointshell", clientName)
                 .addType(newClass)
-        gitPull()
 
         return fileSpec.build().toString()
-
     }
 
 
-    fun gitPull() {
+    fun prepareShell() {
 
 
         try {
@@ -138,4 +136,9 @@ class Generator {
 
     }
 
+
+    fun writeClass(classString: String) {
+        File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/Client.kt")
+                .writeText(classString)
+    }
 }

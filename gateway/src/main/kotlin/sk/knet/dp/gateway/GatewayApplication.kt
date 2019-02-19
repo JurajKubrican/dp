@@ -1,11 +1,11 @@
-package sk.knet.dp.endpointshell
+package sk.knet.dp.gateway
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class EndpointShellApplication
+class GatewayApplication
 
 fun main(args: Array<String>) {
-    runApplication<EndpointShellApplication>(*args)
+    runApplication<GatewayApplication>(*args)
 }

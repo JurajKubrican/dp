@@ -1,7 +1,19 @@
 package sk.knet.dp.generator
 
 import com.squareup.kotlinpoet.*
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.springframework.web.bind.annotation.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.util.Collections.singleton
+import java.util.logging.Level.SEVERE
+import java.io.IOException
+import org.eclipse.jgit.api.errors.GitAPIException
+import org.eclipse.jgit.api.PullCommand
+import org.eclipse.jgit.internal.storage.file.FileRepository
 
 
 data class Prop(
@@ -26,11 +38,10 @@ class Generator {
 
         val clientName = "ExampleClient"
         val endpointGET = setOf(
-                Endpoint("exampleEndpoint", RequestMethod.GET, listOf(Prop("name"),Prop("name2"))),
-                Endpoint("exampleEndpoint2", RequestMethod.GET, listOf(Prop("name"),Prop("Fico"))),
+                Endpoint("exampleEndpoint", RequestMethod.GET, listOf(Prop("name"), Prop("name2"))),
+                Endpoint("exampleEndpoint2", RequestMethod.GET, listOf(Prop("name"), Prop("Fico"))),
                 Endpoint("exampleEndpoint3", RequestMethod.GET, listOf(Prop("name")))
         )
-
 
 
         val functions = endpointGET.map { endpoint ->
@@ -54,8 +65,8 @@ class Generator {
 
 
         val endpointPOST = setOf(
-                Endpoint("exampleEndpointPOST", RequestMethod.POST, listOf(Prop("name"),Prop("name2"))),
-                Endpoint("exampleEndpointPOST2", RequestMethod.POST, listOf(Prop("name"),Prop("Fico"))),
+                Endpoint("exampleEndpointPOST", RequestMethod.POST, listOf(Prop("name"), Prop("name2"))),
+                Endpoint("exampleEndpointPOST2", RequestMethod.POST, listOf(Prop("name"), Prop("Fico"))),
                 Endpoint("exampleEndpointPOST3", RequestMethod.POST, listOf(Prop("name")))
         )
 
@@ -79,8 +90,6 @@ class Generator {
         }
 
 
-
-
         val newClass = TypeSpec.classBuilder(clientName)
                 .addFunctions(functions.union(functions2))
                 .addAnnotation(RestController::class)
@@ -88,9 +97,44 @@ class Generator {
 
         val fileSpec = FileSpec.builder("", clientName)
                 .addType(newClass)
-
+        gitPull()
 
         return fileSpec.build().toString()
+
+    }
+
+
+    fun gitPull() {
+
+
+        try {
+            val localRepo = FileRepository("./endpoint-shell/.git")
+            val git = Git(localRepo)
+
+            val pullCmd = git.pull()
+            pullCmd.setCredentialsProvider(UsernamePasswordCredentialsProvider("kubrican.juraj@gmail.com", "&7fjCFy!H7b5hUeV"))
+            pullCmd.call()
+
+
+        } catch (ex: GitAPIException) {
+            File("./endpoint-shell").deleteRecursively()
+            Git.cloneRepository()
+                    .setCredentialsProvider(UsernamePasswordCredentialsProvider("kubrican.juraj@gmail.com", "&7fjCFy!H7b5hUeV"))
+                    .setURI("https://gitlab.interes.group/kubrican.juraj/endpoint-shell.git")
+                    .setDirectory(File("./endpoint-shell"))
+                    .setBranch("master")
+                    .call()
+
+        }
+
+        println(File("./endpoint-shell/gradlew").setExecutable(true))
+        val ps = Runtime.getRuntime()
+                .exec("./gradlew bootrun", null, File("./endpoint-shell"))
+
+//        ps.waitFor()
+//        println(ps.inputStream.bufferedReader().use(BufferedReader::readText))
+//        println(ps.errorStream.bufferedReader().use(BufferedReader::readText))
+
 
     }
 

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*
 import java.io.File
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.internal.storage.file.FileRepository
+import sk.knet.dp.petriflow.Document
+import javax.xml.bind.JAXBContext
 
 
 data class Prop(
@@ -24,18 +26,33 @@ class Generator {
 
 
     @RequestMapping("/register", method = [RequestMethod.GET])
-    fun register(): String {
+    fun registerClient(): String {
 
-        prepareShell()
-        val classFile = generateClass()
-        writeClass(classFile)
+        val clientName = "newmodel"
+
+
+        val file = File("src\\main\\resources\\models\\$clientName.xml")
+        val jaxbContext = JAXBContext.newInstance(Document::class.java)
+
+        val jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+        val document = jaxbUnmarshaller.unmarshal(file) as Document
+
+        val n = Net(document)
+
+        val transitions = n.computedTransitions
+
+
+//        prepareShell()
+
+        val classFile = generateClass(transitions)
+        writeClass(classFile, clientName)
 
 
         return "done"
 
     }
 
-    fun generateClass(): String {
+    fun generateClass(transitions: List<ComputedTransition>): String {
         val clientName = "Client"
         val endpointGET = setOf(
                 Endpoint("Endpoint", RequestMethod.GET, listOf(Prop("name"), Prop("name2"))),
@@ -50,7 +67,7 @@ class Generator {
                     .addAnnotation(AnnotationSpec.builder(GetMapping::class)
                             .addMember("\"$clientName/${endpoint.id}\"")
                             .build())
-                    .addStatement("println(%P)", "Hello, \$name")
+                    .addStatement("return", "Hello, world")
             endpoint.props.forEach { param ->
                 val par = ParameterSpec
                         .builder(param.name, String::class)
@@ -64,11 +81,9 @@ class Generator {
         }
 
 
-        val endpointPOST = setOf(
-                Endpoint("EndpointPOST", RequestMethod.POST, listOf(Prop("name"), Prop("name2"))),
-                Endpoint("EndpointPOST2", RequestMethod.POST, listOf(Prop("name"), Prop("Fico"))),
-                Endpoint("EndpointPOST3", RequestMethod.POST, listOf(Prop("name")))
-        )
+        val endpointPOST = transitions.map {
+            Endpoint("${it.label.value}POST", RequestMethod.POST, it.data.map { Prop(it.id) })
+        }
 
         val functions2 = endpointPOST.map { endpoint ->
 
@@ -76,7 +91,7 @@ class Generator {
                     .addAnnotation(AnnotationSpec.builder(PostMapping::class)
                             .addMember("\"$clientName/${endpoint.id}\"")
                             .build())
-                    .addStatement("println(%P)", "Hello, \$name")
+                    .addStatement("return", "Hello, world")
             endpoint.props.forEach { param ->
                 val par = ParameterSpec
                         .builder(param.name, String::class)
@@ -125,20 +140,25 @@ class Generator {
 
         }
 
-        println(File("./endpoint-shell/gradlew").setExecutable(true))
-        val ps = Runtime.getRuntime()
-                .exec("./gradlew bootrun", null, File("./endpoint-shell"))
 
-//        ps.waitFor()
-//        println(ps.inputStream.bufferedReader().use(BufferedReader::readText))
-//        println(ps.errorStream.bufferedReader().use(BufferedReader::readText))
+//
 
 
     }
 
 
-    fun writeClass(classString: String) {
-        File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/Client.kt")
+    fun writeClass(classString: String, clientName: String) {
+        File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/$clientName.kt")
                 .writeText(classString)
+
+        println(File("./endpoint-shell/gradlew").setExecutable(true))
+//        val ps = Runtime.getRuntime()
+//                .exec("./gradlew bootrun", null, File("./endpoint-shell"))
+
+
+//        ps.waitFor()
+//        println(ps.inputStream.bufferedReader().use(BufferedReader::readText))
+//        println(ps.errorStream.bufferedReader().use(BufferedReader::readText))
+
     }
 }

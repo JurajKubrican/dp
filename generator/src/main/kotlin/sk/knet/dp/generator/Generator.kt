@@ -7,13 +7,25 @@ import org.springframework.web.bind.annotation.*
 import java.io.File
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.internal.storage.file.FileRepository
-import sk.knet.dp.petriflow.Document
-import javax.xml.bind.JAXBContext
+import kotlin.reflect.KClass
 
+
+//enum class PropType(val string: String) {
+//    NUMBER("number"),
+//    TEXT("text"),
+//    ENUMERATION("enumeration"),
+//    MULTICHOICE("multichoice"),
+//    BOOLEAN("boolean"),
+//    date,
+//    file,
+//    user,
+//    caseref,
+//    dateTime,
+//}
 
 data class Prop(
-        val name: String
-)
+        val name: String,
+        val type: KClass<String> = String::class)
 
 data class Endpoint(
         val id: String,
@@ -31,18 +43,12 @@ class Generator {
         val clientName = "newmodel"
 
 
-        val file = File("src\\main\\resources\\models\\$clientName.xml")
-        val jaxbContext = JAXBContext.newInstance(Document::class.java)
-
-        val jaxbUnmarshaller = jaxbContext.createUnmarshaller()
-        val document = jaxbUnmarshaller.unmarshal(file) as Document
-
-        val n = Net(document)
+        val n = Net("src\\main\\resources\\models\\$clientName.xml")
 
         val transitions = n.computedTransitions
 
 
-//        prepareShell()
+        prepareShell()
 
         val classFile = generateClass(transitions)
         writeClass(classFile, clientName)
@@ -70,7 +76,7 @@ class Generator {
                     .addStatement("return", "Hello, world")
             endpoint.props.forEach { param ->
                 val par = ParameterSpec
-                        .builder(param.name, String::class)
+                        .builder(param.name, param.type)
                         .addAnnotation(RequestParam::class)
                         .build()
                 fs.addParameter(par)
@@ -82,7 +88,9 @@ class Generator {
 
 
         val endpointPOST = transitions.map {
-            Endpoint("${it.label.value}POST", RequestMethod.POST, it.data.map { Prop(it.id) })
+            Endpoint("${it.label.value}POST", RequestMethod.POST, it.data.map { itt ->
+                Prop(itt.id)
+            })
         }
 
         val functions2 = endpointPOST.map { endpoint ->
@@ -94,7 +102,7 @@ class Generator {
                     .addStatement("return", "Hello, world")
             endpoint.props.forEach { param ->
                 val par = ParameterSpec
-                        .builder(param.name, String::class)
+                        .builder(param.name, param.type)
                         .addAnnotation(RequestParam::class)
                         .build()
                 fs.addParameter(par)

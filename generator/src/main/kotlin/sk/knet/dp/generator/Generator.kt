@@ -10,19 +10,6 @@ import org.eclipse.jgit.internal.storage.file.FileRepository
 import kotlin.reflect.KClass
 
 
-//enum class PropType(val string: String) {
-//    NUMBER("number"),
-//    TEXT("text"),
-//    ENUMERATION("enumeration"),
-//    MULTICHOICE("multichoice"),
-//    BOOLEAN("boolean"),
-//    date,
-//    file,
-//    user,
-//    caseref,
-//    dateTime,
-//}
-
 data class Prop(
         val name: String,
         val type: KClass<String> = String::class)
@@ -36,9 +23,15 @@ data class Endpoint(
 @RestController
 class Generator {
 
+    val endpointProcesses: MutableList<Process> = mutableListOf()
+
+    init {
+        registerClient()
+    }
+
 
     @RequestMapping("/register", method = [RequestMethod.GET])
-    fun registerClient(): String {
+    final fun registerClient(): String {
 
         val clientName = "newmodel"
 
@@ -159,14 +152,27 @@ class Generator {
         File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/$clientName.kt")
                 .writeText(classString)
 
-        println(File("./endpoint-shell/gradlew").setExecutable(true))
-//        val ps = Runtime.getRuntime()
-//                .exec("./gradlew bootrun", null, File("./endpoint-shell"))
+        endpointProcesses.map {
+            println("Killing process: $it")
+            it.destroyForcibly()
+        }
+        endpointProcesses.removeAll { true }
+
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            val ps = Runtime.getRuntime()
+                    .exec("powershell ./gradlew bootrun", null, File("./endpoint-shell"))
+            endpointProcesses.add(ps)
+            println("Starting process: $ps")
 
 
-//        ps.waitFor()
-//        println(ps.inputStream.bufferedReader().use(BufferedReader::readText))
-//        println(ps.errorStream.bufferedReader().use(BufferedReader::readText))
+        } else {
+            File("./endpoint-shell/gradlew").setExecutable(true)
+            val ps = Runtime.getRuntime()
+                    .exec("./gradlew bootrun", null, File("./endpoint-shell"))
+            endpointProcesses.add(ps)
+            println("Starting process: $ps")
+        }
+
 
     }
 }

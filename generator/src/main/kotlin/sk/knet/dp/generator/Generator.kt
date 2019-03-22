@@ -36,7 +36,7 @@ class Generator {
         val clientName = "newmodel"
 
 
-        val n = Net("src\\main\\resources\\models\\$clientName.xml")
+        val n = Net("src/main/resources/models/$clientName.xml")
 
         val transitions = n.computedTransitions
 
@@ -126,23 +126,19 @@ class Generator {
             val git = Git(localRepo)
 
             val pullCmd = git.pull()
-            pullCmd.setCredentialsProvider(UsernamePasswordCredentialsProvider("kubrican.juraj@gmail.com", "&7fjCFy!H7b5hUeV"))
             pullCmd.call()
 
 
         } catch (ex: GitAPIException) {
             File("./endpoint-shell").deleteRecursively()
             Git.cloneRepository()
-                    .setCredentialsProvider(UsernamePasswordCredentialsProvider("kubrican.juraj@gmail.com", "&7fjCFy!H7b5hUeV"))
-                    .setURI("https://gitlab.interes.group/kubrican.juraj/endpoint-shell.git")
+                    .setURI("git@github.com:TheYurry/dp_endpoint.git")
                     .setDirectory(File("./endpoint-shell"))
                     .setBranch("master")
                     .call()
 
         }
 
-
-//
 
 
     }
@@ -167,12 +163,17 @@ class Generator {
 
         } else {
             File("./endpoint-shell/gradlew").setExecutable(true)
-            val ps = Runtime.getRuntime()
-                    .exec("./gradlew bootrun", null, File("./endpoint-shell"))
-            endpointProcesses.add(ps)
-            println("Starting process: $ps")
+            for (i in 2..4) {
+                val ps = Runtime.getRuntime()
+                        .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File("./endpoint-shell"))
+                endpointProcesses.add(ps)
+                println("Starting process: $ps")
+            }
+
         }
 
 
     }
+
+
 }

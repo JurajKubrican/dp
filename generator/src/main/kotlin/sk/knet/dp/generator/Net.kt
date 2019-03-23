@@ -24,8 +24,8 @@ class Net(f: String) {
     }
 
 
-    private fun loadFile(file: String): Document {
-        val file = File(file)
+    private fun loadFile(fileName: String): Document {
+        val file = File(fileName)
         val jaxbContext = JAXBContext.newInstance(Document::class.java)
 
         val jaxbUnmarshaller = jaxbContext.createUnmarshaller()

@@ -1,0 +1,27 @@
+server:
+  port: 8080
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:7777/eureka/
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: register_route
+          uri: "http://localhost:8081/register"
+          predicates:
+            - "Path=/register"
+        - id: service_route
+          uri: "http://localhost:8083/"
+          predicates:
+            - "Path=/**"
+
+ribbon:
+  eureka:
+    enabled: false
+#load-balanced-service:
+#  ribbon:
+#    listOfServers: http://localhost:8082, http://localhost:8083, http://localhost:8084

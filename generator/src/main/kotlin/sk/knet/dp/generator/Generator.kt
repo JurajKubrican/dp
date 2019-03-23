@@ -2,7 +2,6 @@ package sk.knet.dp.generator
 
 import com.squareup.kotlinpoet.*
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.springframework.web.bind.annotation.*
 import java.io.File
 import org.eclipse.jgit.api.errors.GitAPIException
@@ -66,7 +65,7 @@ class Generator {
                     .addAnnotation(AnnotationSpec.builder(GetMapping::class)
                             .addMember("\"$clientName/${endpoint.id}\"")
                             .build())
-                    .addStatement("return", "Hello, world")
+                    .addStatement("return \"Helloworld\"")
             endpoint.props.forEach { param ->
                 val par = ParameterSpec
                         .builder(param.name, param.type)
@@ -92,7 +91,7 @@ class Generator {
                     .addAnnotation(AnnotationSpec.builder(PostMapping::class)
                             .addMember("\"$clientName/${endpoint.id}\"")
                             .build())
-                    .addStatement("return", "Hello, world")
+                    .addStatement("return \"Helloworld\"")
             endpoint.props.forEach { param ->
                 val par = ParameterSpec
                         .builder(param.name, param.type)
@@ -174,6 +173,9 @@ class Generator {
 
 
     }
+
+
+
 
 
 }

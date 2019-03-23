@@ -1,9 +1,0 @@
-spring:
-  application:
-    cloud:
-      gateway:
-        routes:
-          - id: baeldung
-            uri: baeldung.com
-          - id: myOtherRouting
-            uri: localhost:9999

@@ -11,8 +11,14 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
+import org.springframework.stereotype.Controller
 import kotlin.reflect.KClass
+import kotlin.reflect.jvm.internal.impl.load.java.lazy.ContextKt.child
+import java.io.InputStreamReader
+import java.io.BufferedReader
+import java.util.concurrent.TimeUnit
 
 
 data class Prop(
@@ -25,7 +31,8 @@ data class Endpoint(
         var props: List<Prop>)
 
 
-@RestController
+@Controller
+@EnableResourceServer
 class Generator {
 
     val endpointProcesses: MutableList<Process> = mutableListOf()
@@ -166,10 +173,14 @@ class Generator {
             var ps = Runtime.getRuntime()
                     .exec("./gradlew build", null, File("./endpoint-shell"))
             ps.waitFor()
-            ps.destroy()
+//            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+//            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
 
             ps = Runtime.getRuntime()
                     .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File("./endpoint-shell"))
+//            ps.waitFor(30,TimeUnit.SECONDS)
+//            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+//            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
             endpointProcesses.add(ps)
 
         }

@@ -145,7 +145,7 @@ class Generator {
         } catch (ex: GitAPIException) {
             File("./endpoint-shell").deleteRecursively()
             Git.cloneRepository()
-                    .setURI("git@github.com:TheYurry/dp_endpoint.git")
+                    .setURI("https://github.com/TheYurry/dp_endpoint.git")
                     .setDirectory(File("./endpoint-shell"))
                     .setBranch("master")
                     .call()

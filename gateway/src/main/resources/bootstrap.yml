@@ -23,7 +23,7 @@ spring:
           predicates:
             - "Path=/user"
         - id: service_route
-          uri: "http://localhost:8083/"
+          uri: "http://localhost:8082/"
           predicates:
             - "Path=/**"
 

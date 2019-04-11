@@ -1,0 +1,1517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <role>
+        <id>client</id>
+        <name>Client</name>
+    </role>
+    <role>
+        <id>bureau_agent</id>
+        <name>Credit Bureau Agent</name>
+    </role>
+    <role>
+        <id>loan_officer</id>
+        <name>Loan Officer</name>
+    </role>
+    <role>
+        <id>underwriter</id>
+        <name>Underwriter</name>
+    </role>
+    <role>
+        <id>property_appraiser</id>
+        <name>Property Appraiser</name>
+    </role>
+    <role>
+        <id>account_clerk</id>
+        <name>Account Clerk</name>
+    </role>
+    <!-- DATA -->
+    <data type="text">
+        <id>name</id>
+        <title>Name</title>
+        <placeholder>Your name</placeholder>
+        <desc>Your first name</desc>
+    </data>
+    <data type="text">
+        <id>surname</id>
+        <title>Surname</title>
+        <placeholder>Your surname</placeholder>
+        <desc>Your second name</desc>
+    </data>
+    <data type="date">
+        <id>date_of_birth</id>
+        <title>Date of Birth</title>
+    </data>
+    <data type="text">
+        <id>street</id>
+        <title>Street</title>
+    </data>
+    <data type="text">
+        <id>streetnumber</id>
+        <title>Street Number</title>
+    </data>
+    <data type="text">
+        <id>postal</id>
+        <title>Postal code</title>
+    </data>
+    <data type="enumeration">
+        <id>city</id>
+        <title>City</title>
+    </data>
+    <data type="boolean">
+        <id>calc</id>
+        <action trigger="set">
+            income: f.income,
+            loan: f.loan_amount,
+            q1: f.question_mortgage_lates,
+            q2: f.question_amount,
+            q3: f.question_jobs,
+            score: f.score;
+            change score about {
+            def part = loan.value - income.value;
+            part *= q1.value ? 1.2 : 1;
+            part *= q2.value ? 1.1 : 1;
+            part *= q3.value ? 1.05 : 1;
+            return part/1000;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <id>income</id>
+        <title>Monthly Income</title>
+        <desc>Your average monthly income</desc>
+        <valid>inrange 300,100000</valid>
+        <action trigger="set">
+            calc: f.calc;
+            change calc about {
+            return !calc.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <id>loan_amount</id>
+        <title>Loan amount</title>
+        <valid>inrange 30000,10000000</valid>
+        <action trigger="set">
+            calc: f.calc;
+            change calc about {
+            return !calc.value;
+            }
+        </action>
+    </data>
+
+    <data type="boolean">
+        <id>question_mortgage_lates</id>
+        <title>Does client have recent mortgage lates?</title>
+        <init>false</init>
+        <action trigger="set">
+            calc: f.calc;
+            change calc about {
+            return !calc.value;
+            }
+        </action>
+    </data>
+    <data type="boolean">
+        <id>question_amount</id>
+        <title>Is the loan amount too big?</title>
+        <init>false</init>
+        <action trigger="set">
+            calc: f.calc;
+            change calc about {
+            return !calc.value;
+            }
+        </action>
+    </data>
+    <data type="boolean">
+        <id>question_jobs</id>
+        <title>Did the client changed job recently?</title>
+        <init>false</init>
+        <action trigger="set">
+            calc: f.calc;
+            change calc about {
+            return !calc.value;
+            }
+        </action>
+    </data>
+    <data type="number">
+        <id>score</id>
+        <title>Credit Score</title>
+        <init>0</init>
+    </data>
+    <data type="text">
+        <id>reject_underwriter_reason</id>
+        <title>Rejection Reason</title>
+        <desc>Write down reason why the mortgage was rejected</desc>
+        <values>area</values>
+        <action trigger="set">
+            reject: f.this,
+            status: f.status;
+            change status about {
+            if(reject?.value?.trim())
+            return "Rejected";
+            }
+        </action>
+    </data>
+    <data type="enumeration">
+        <id>status</id>
+        <title>Status</title>
+        <values>Applied for mortgage</values>
+        <values>Mortgage Accepted</values>
+        <values>Rejected</values>
+        <init>Applied for mortgage</init>
+    </data>
+    <data type="text">
+        <id>reject_loanofficer_reason</id>
+        <title>Rejection reason</title>
+        <values>area</values>
+        <action trigger="set">
+            reject: f.this,
+            status: f.status;
+            change status about {
+            if(reject?.value?.trim())
+            return "Rejected";
+            }
+        </action>
+    </data>
+    <data type="file">
+        <id>confirmation_mortgage</id>
+        <title>Mortgage confirmation</title>
+    </data>
+    <data type="file">
+        <id>confirmation_insurance</id>
+        <title>Insurance confirmation</title>
+    </data>
+    <data type="file">
+        <id>appraisal</id>
+        <title>Appraisal report</title>
+    </data>
+    <data type="number">
+        <id>appraised_value</id>
+        <title>Appraised value</title>
+        <valid>positive</valid>
+    </data>
+    <data type="boolean">
+        <id>delete_case</id>
+        <title>Are you sure you want to delete?</title>
+        <init>false</init>
+    </data>
+    <data type="number">
+        <id>floor</id>
+        <title>Floor Area</title>
+        <init>0</init>
+    </data>
+    <data type="enumeration">
+        <id>type</id>
+        <title>Property</title>
+        <values>House</values>
+        <values>Flat</values>
+        <values>Bungalow</values>
+        <values>Cabin</values>
+        <init>House</init>
+    </data>
+    <data type="number">
+        <id>years</id>
+        <title>How old is the property</title>
+    </data>
+    <data type="file">
+        <id>photo</id>
+        <title>Photos of property</title>
+    </data>
+    <data type="date">
+        <id>sign</id>
+        <title>Sign date</title>
+    </data>
+    <data type="date">
+        <id>insurance</id>
+        <title>Insurance sign date</title>
+    </data>
+    <data type="file">
+        <id>payment</id>
+        <title>Payment confirmation</title>
+    </data>
+    <data type="boolean">
+        <id>approved</id>
+        <title>Approved</title>
+        <action trigger="set">
+            decision: f.this,
+            approveArc: f.1;
+            change approveArc about {
+            return decision.value ? 1 : 0;
+            }
+        </action>
+        <action trigger="set">
+            decision: f.this,
+            disapproveArc: f.2;
+            change disapproveArc about {
+            return decision.value ? 0 : 1;
+            }
+        </action>
+        <action trigger="set">
+            decision: f.this,
+            status: f.status;
+            change status about {
+            if(decision.value)
+            return "Mortgage Accepted";
+            else
+            return "Rejected";
+            }
+        </action>
+    </data>
+    <data type="number">
+        <id>1</id>
+        <title>Approve arc</title>
+        <init>0</init>
+    </data>
+    <data type="number">
+        <id>2</id>
+        <title>Disapprove arc</title>
+        <init>1</init>
+    </data>
+    <data type="text">
+        <id>hidden_field</id>
+        <title>Hidden</title>
+    </data>
+
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>100</x>
+        <y>260</y>
+        <label>Apply for pre-approval</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Personal information</title>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>surname</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>date_of_birth</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Address</title>
+            <dataRef>
+                <id>street</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>streetnumber</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>postal</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <action trigger="set">
+                        field: f.this,
+                        city: f.city;
+                        change city choices {
+                        def postals = psc byCode,field.value;
+                        return postals.collect({it.city}).unique();
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>city</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>Finance data</id>
+            <dataRef>
+                <id>income</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>loan_amount</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>5</id>
+        <x>260</x>
+        <y>60</y>
+        <label>Credit report</label>
+        <roleRef>
+            <id>bureau_agent</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Client information</title>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>surname</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>income</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>loan_amount</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>question_mortgage_lates</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>question_amount</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>question_jobs</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>3</id>
+            <alignment>end</alignment>
+            <dataRef>
+                <id>score</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>9</id>
+        <x>300</x>
+        <y>260</y>
+        <label>Pre - qualify</label>
+        <roleRef>
+            <id>loan_officer</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>14</id>
+        <x>340</x>
+        <y>420</y>
+        <label>Reject pre - qualification</label>
+        <roleRef>
+            <id>loan_officer</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Rejection</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>reject_loanofficer_reason</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>18</id>
+        <x>780</x>
+        <y>420</y>
+        <label>Read rejection letter</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Rejection Reason</title>
+            <dataRef>
+                <id>reject_loanofficer_reason</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="get">
+                        field: f.this,
+                        trans: t.this;
+                        make field,visible on trans when {
+                        return field?.value?.trim();
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>reject_underwriter_reason</id>
+                <logic>
+                    <behavior>hidden</behavior>
+                    <action trigger="get">
+                        field: f.this,
+                        trans: t.this;
+                        make field,visible on trans when {
+                        return field?.value?.trim();
+                        }
+                    </action>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>23</id>
+        <x>540</x>
+        <y>60</y>
+        <label>Pre - approve</label>
+        <roleRef>
+            <id>underwriter</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+    </transition>
+    <transition>
+        <id>26</id>
+        <x>540</x>
+        <y>340</y>
+        <label>Reject pre - approval</label>
+        <roleRef>
+            <id>underwriter</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>reject_underwriter_reason</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>30</id>
+        <x>420</x>
+        <y>180</y>
+        <label>Read Credit report and Pre - qualification data</label>
+        <roleRef>
+            <id>underwriter</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Personal information</title>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>surname</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>income</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>loan_amount</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Additional information</title>
+            <stretch>true</stretch>
+            <dataRef>
+                <id>question_mortgage_lates</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>question_amount</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>question_jobs</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>score</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>35</id>
+        <x>740</x>
+        <y>60</y>
+        <label>Apply for mortgage loan</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Property</title>
+            <alignment>start</alignment>
+            <dataRef>
+                <id>floor</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>type</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>years</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>photo</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>39</id>
+        <x>820</x>
+        <y>220</y>
+        <label>Appraisal report</label>
+        <roleRef>
+            <id>property_appraiser</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Property data</title>
+            <dataRef>
+                <id>floor</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>type</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>years</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>photo</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+        <dataGroup>
+            <id>2</id>
+            <title>Appraisal</title>
+            <dataRef>
+                <id>appraisal</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>appraised_value</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>approved</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>48</id>
+        <x>780</x>
+        <y>500</y>
+        <label>Delete</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <alignment>center</alignment>
+            <dataRef>
+                <id>delete_case</id>
+                <logic>
+                    <behavior>editable</behavior>
+                    <behavior>required</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>53</id>
+        <x>180</x>
+        <y>340</y>
+        <label>Read application data</label>
+        <roleRef>
+            <id>loan_officer</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Personal information</title>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>surname</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>date_of_birth</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>street</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>streetnumber</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>postal</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>city</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>income</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>loan_amount</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>59</id>
+        <x>1180</x>
+        <y>60</y>
+        <label>Confirm inscripted mortgage</label>
+        <roleRef>
+            <id>underwriter</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>confirmation_insurance</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>insurance</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>61</id>
+        <x>980</x>
+        <y>140</y>
+        <label>Sign loan contract</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <title>Personal infromation</title>
+            <dataRef>
+                <id>name</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>surname</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>date_of_birth</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>street</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>streetnumber</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>postal</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>city</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>income</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>loan_amount</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>sign</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>72</id>
+        <x>1180</x>
+        <y>220</y>
+        <label>Sign insurance contract</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>confirmation_insurance</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>insurance</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>78</id>
+        <x>1380</x>
+        <y>140</y>
+        <label>Send money</label>
+        <roleRef>
+            <id>account_clerk</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>loan_amount</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+            <dataRef>
+                <id>payment</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>92</id>
+        <x>980</x>
+        <y>340</y>
+        <label>Loan contract</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>confirmation_mortgage</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>94</id>
+        <x>1180</x>
+        <y>420</y>
+        <label>Insurance contract</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>confirmation_insurance</id>
+                <logic>
+                    <behavior>editable</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>96</id>
+        <x>1380</x>
+        <y>340</y>
+        <label>Proof of payment</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>payment</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <transition>
+        <id>155</id>
+        <x>180</x>
+        <y>500</y>
+        <label>Status</label>
+        <roleRef>
+            <id>client</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <dataGroup>
+            <id>1</id>
+            <dataRef>
+                <id>status</id>
+                <logic>
+                    <behavior>visible</behavior>
+                </logic>
+            </dataRef>
+        </dataGroup>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>2</id>
+        <x>20</x>
+        <y>260</y>
+        <label></label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>11</id>
+        <x>180</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>16</id>
+        <x>660</x>
+        <y>420</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>20</id>
+        <x>420</x>
+        <y>260</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>22</id>
+        <x>420</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>33</id>
+        <x>660</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>37</id>
+        <x>740</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>41</id>
+        <x>900</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>50</id>
+        <x>180</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>67</id>
+        <x>1060</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>70</id>
+        <x>1060</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>74</id>
+        <x>1300</x>
+        <y>60</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>75</id>
+        <x>1260</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>81</id>
+        <x>1380</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>83</id>
+        <x>980</x>
+        <y>220</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>87</id>
+        <x>1180</x>
+        <y>300</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>156</id>
+        <x>100</x>
+        <y>460</y>
+        <label></label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>3</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>12</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>11</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>13</id>
+        <type>regular</type>
+        <sourceId>11</sourceId>
+        <destinationId>9</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>15</id>
+        <type>regular</type>
+        <sourceId>11</sourceId>
+        <destinationId>14</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>17</id>
+        <type>regular</type>
+        <sourceId>14</sourceId>
+        <destinationId>16</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>19</id>
+        <type>read</type>
+        <sourceId>16</sourceId>
+        <destinationId>18</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>21</id>
+        <type>regular</type>
+        <sourceId>9</sourceId>
+        <destinationId>20</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>24</id>
+        <type>regular</type>
+        <sourceId>22</sourceId>
+        <destinationId>23</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>25</id>
+        <type>regular</type>
+        <sourceId>20</sourceId>
+        <destinationId>23</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>27</id>
+        <type>regular</type>
+        <sourceId>22</sourceId>
+        <destinationId>26</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>28</id>
+        <type>regular</type>
+        <sourceId>26</sourceId>
+        <destinationId>16</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>29</id>
+        <type>regular</type>
+        <sourceId>5</sourceId>
+        <destinationId>22</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>31</id>
+        <type>read</type>
+        <sourceId>22</sourceId>
+        <destinationId>30</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>34</id>
+        <type>regular</type>
+        <sourceId>23</sourceId>
+        <destinationId>33</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>36</id>
+        <type>regular</type>
+        <sourceId>33</sourceId>
+        <destinationId>35</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>38</id>
+        <type>regular</type>
+        <sourceId>35</sourceId>
+        <destinationId>37</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>40</id>
+        <type>regular</type>
+        <sourceId>37</sourceId>
+        <destinationId>39</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>42</id>
+        <type>variable</type>
+        <sourceId>39</sourceId>
+        <destinationId>41</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>45</id>
+        <type>variable</type>
+        <sourceId>39</sourceId>
+        <destinationId>16</destinationId>
+        <multiplicity>2</multiplicity>
+    </arc>
+    <arc>
+        <id>49</id>
+        <type>regular</type>
+        <sourceId>16</sourceId>
+        <destinationId>48</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>51</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>50</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>52</id>
+        <type>regular</type>
+        <sourceId>50</sourceId>
+        <destinationId>5</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>54</id>
+        <type>read</type>
+        <sourceId>11</sourceId>
+        <destinationId>53</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>55</id>
+        <type>reset</type>
+        <sourceId>50</sourceId>
+        <destinationId>14</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>56</id>
+        <type>reset</type>
+        <sourceId>22</sourceId>
+        <destinationId>14</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>57</id>
+        <type>reset</type>
+        <sourceId>11</sourceId>
+        <destinationId>26</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>58</id>
+        <type>reset</type>
+        <sourceId>20</sourceId>
+        <destinationId>26</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>65</id>
+        <type>regular</type>
+        <sourceId>41</sourceId>
+        <destinationId>61</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>68</id>
+        <type>regular</type>
+        <sourceId>61</sourceId>
+        <destinationId>67</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>69</id>
+        <type>regular</type>
+        <sourceId>67</sourceId>
+        <destinationId>59</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>71</id>
+        <type>regular</type>
+        <sourceId>61</sourceId>
+        <destinationId>70</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>73</id>
+        <type>regular</type>
+        <sourceId>70</sourceId>
+        <destinationId>72</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>76</id>
+        <type>regular</type>
+        <sourceId>59</sourceId>
+        <destinationId>74</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>77</id>
+        <type>regular</type>
+        <sourceId>72</sourceId>
+        <destinationId>75</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>79</id>
+        <type>regular</type>
+        <sourceId>74</sourceId>
+        <destinationId>78</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>80</id>
+        <type>regular</type>
+        <sourceId>75</sourceId>
+        <destinationId>78</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>82</id>
+        <type>regular</type>
+        <sourceId>78</sourceId>
+        <destinationId>81</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>86</id>
+        <type>regular</type>
+        <sourceId>61</sourceId>
+        <destinationId>83</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>90</id>
+        <type>regular</type>
+        <sourceId>72</sourceId>
+        <destinationId>87</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>93</id>
+        <type>read</type>
+        <sourceId>83</sourceId>
+        <destinationId>92</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>95</id>
+        <type>read</type>
+        <sourceId>87</sourceId>
+        <destinationId>94</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>97</id>
+        <type>read</type>
+        <sourceId>81</sourceId>
+        <destinationId>96</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>157</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>156</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>158</id>
+        <type>read</type>
+        <sourceId>156</sourceId>
+        <destinationId>155</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>159</id>
+        <type>regular</type>
+        <sourceId>156</sourceId>
+        <destinationId>48</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+</document>

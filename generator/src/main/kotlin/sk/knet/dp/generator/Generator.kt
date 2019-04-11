@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*
 import java.io.File
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.internal.storage.file.FileRepository
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
@@ -14,6 +15,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
 import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
+import org.springframework.web.multipart.MultipartFile
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.internal.impl.load.java.lazy.ContextKt.child
 import java.io.InputStreamReader
@@ -37,25 +40,34 @@ class Generator {
 
     val endpointProcesses: MutableList<Process> = mutableListOf()
 
+    @Autowired
+    lateinit var fileStorage: FileStorage
+
     init {
-        registerClient()
+//        registerClient()
     }
 
 
-    @RequestMapping("/register", method = [RequestMethod.GET])
-    final fun registerClient(): String {
 
-        val clientName = "newmodel"
+    @RequestMapping("/register", method = [RequestMethod.POST])
+    final fun registerClient(
+            @RequestParam("uploadfile") file: MultipartFile,
+            @RequestParam("clientname") clientName: String,
+            model: Model): String {
 
 
-        val n = Net("src/main/resources/models/$clientName.xml")
+        val tmpFilnename = fileStorage.store(file)
+
+
+
+        val n = Net("filestorage/$tmpFilnename")
 
         val transitions = n.computedTransitions
 
 
         prepareShell()
 
-        val classFile = generateClass(transitions)
+        val classFile = generateClass(transitions,clientName)
         writeClass(classFile, clientName)
 
 
@@ -63,8 +75,7 @@ class Generator {
 
     }
 
-    fun generateClass(transitions: List<ComputedTransition>): String {
-        val clientName = "Client"
+    fun generateClass(transitions: List<ComputedTransition>, className: String ): String {
         val endpointGET = setOf(
                 Endpoint("Endpoint", RequestMethod.GET, listOf(Prop("name"), Prop("name2"))),
                 Endpoint("Endpoint2", RequestMethod.GET, listOf(Prop("name"), Prop("Fico"))),
@@ -76,7 +87,7 @@ class Generator {
 
             val fs = FunSpec.builder(endpoint.id)
                     .addAnnotation(AnnotationSpec.builder(GetMapping::class)
-                            .addMember("\"$clientName/${endpoint.id}\"")
+                            .addMember("\"$className/${endpoint.id}\"")
                             .build())
                     .addStatement("return \"Helloworld\"")
             endpoint.props.forEach { param ->
@@ -102,7 +113,7 @@ class Generator {
 
             val fs = FunSpec.builder(endpoint.id)
                     .addAnnotation(AnnotationSpec.builder(PostMapping::class)
-                            .addMember("\"$clientName/${endpoint.id}\"")
+                            .addMember("\"$className/${endpoint.id}\"")
                             .build())
                     .addStatement("return \"Helloworld\"")
             endpoint.props.forEach { param ->
@@ -118,13 +129,13 @@ class Generator {
         }
 
 
-        val newClass = TypeSpec.classBuilder(clientName)
+        val newClass = TypeSpec.classBuilder(className)
                 .addFunctions(functions.union(functions2))
                 .addAnnotation(RestController::class)
                 .addAnnotation(EnableResourceServer::class)
                 .build()
 
-        val fileSpec = FileSpec.builder("sk.knet.dp.endpointshell", clientName)
+        val fileSpec = FileSpec.builder("sk.knet.dp.endpointshell", className)
                 .addType(newClass)
 
         return fileSpec.build().toString()
@@ -168,12 +179,11 @@ class Generator {
 
 
         File("./endpoint-shell/gradlew").setExecutable(true)
-        for (i in 2..4) {
+        for (i in 2..2) {
             println("building: $i")
             var ps = Runtime.getRuntime()
                     .exec("./gradlew build", null, File("./endpoint-shell"))
             ps.waitFor()
-//            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
 //            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
 
             ps = Runtime.getRuntime()

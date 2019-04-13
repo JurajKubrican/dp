@@ -8,12 +8,12 @@ import java.security.Principal
 
 @EnableResourceServer
 @Controller
-class UserResource{
+class UserResource {
 
     @Autowired
     lateinit var userDetailStore: UserDetailStore
 
-    @GetMapping("/user" )
+    @GetMapping("/user")
     @ResponseBody
     fun getUser(user: Principal): Principal {
         return user
@@ -21,9 +21,19 @@ class UserResource{
 
 
     @PostMapping("/user")
+    @ResponseBody
+    fun postUser(
+            @RequestParam("client") clientName: String,
+            @RequestParam("role") role: String,
+            @RequestParam("pass") pass: String
+    ) {
 
-    fun postUser(client: String, role: String, pass: String) {
-        userDetailStore.manager.createUser(userDetailStore.users.username(role).password(pass).roles(client + "_" + role).build())
+        userDetailStore.manager.createUser(
+                userDetailStore.users.username(clientName + "_" + role)
+                        .password(pass)
+                        .roles(clientName + "_" + role)
+                        .build())
+        print(userDetailStore.manager)
     }
 
 }

@@ -2,6 +2,7 @@ package sk.knet.dp.generator
 
 import com.squareup.kotlinpoet.*
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.ResetCommand
 import org.springframework.web.bind.annotation.*
 import java.io.File
 import org.eclipse.jgit.api.errors.GitAPIException
@@ -17,16 +18,18 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.multipart.MultipartFile
+import sk.knet.dp.petriflow.Behavior
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.internal.impl.load.java.lazy.ContextKt.child
 import java.io.InputStreamReader
 import java.io.BufferedReader
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
 data class Prop(
         val name: String,
-        val type: KClass<String> = String::class)
+        val required: Boolean)
 
 data class Endpoint(
         val id: String,
@@ -43,22 +46,15 @@ class Generator {
     @Autowired
     lateinit var fileStorage: FileStorage
 
-    init {
-//        registerClient()
-    }
 
-
-
-    @RequestMapping("/register", method = [RequestMethod.POST])
+    @PostMapping("/register")
     final fun registerClient(
-            @RequestParam("uploadfile") file: MultipartFile,
-            @RequestParam("clientname") clientName: String,
+            @RequestParam(value = "uploadfile") file: MultipartFile,
+            @RequestParam(value = "clientname") clientName: String,
             model: Model): String {
 
 
         val tmpFilnename = fileStorage.store(file)
-
-
 
         val n = Net("filestorage/$tmpFilnename")
 
@@ -67,7 +63,7 @@ class Generator {
 
         prepareShell()
 
-        val classFile = generateClass(transitions,clientName)
+        val classFile = generateClass(transitions, clientName)
         writeClass(classFile, clientName)
 
 
@@ -75,62 +71,96 @@ class Generator {
 
     }
 
-    fun generateClass(transitions: List<ComputedTransition>, className: String ): String {
-        val endpointGET = setOf(
-                Endpoint("Endpoint", RequestMethod.GET, listOf(Prop("name"), Prop("name2"))),
-                Endpoint("Endpoint2", RequestMethod.GET, listOf(Prop("name"), Prop("Fico"))),
-                Endpoint("Endpoint3", RequestMethod.GET, listOf(Prop("name")))
-        )
-
-
-        val functions = endpointGET.map { endpoint ->
-
-            val fs = FunSpec.builder(endpoint.id)
-                    .addAnnotation(AnnotationSpec.builder(GetMapping::class)
-                            .addMember("\"$className/${endpoint.id}\"")
-                            .build())
-                    .addStatement("return \"Helloworld\"")
-            endpoint.props.forEach { param ->
-                val par = ParameterSpec
-                        .builder(param.name, param.type)
-                        .addAnnotation(RequestParam::class)
-                        .build()
-                fs.addParameter(par)
-
-            }
-
-            fs.build()
-        }
-
-
+    fun generatePostFunctions(transitions: List<ComputedTransition>, className: String): List<FunSpec> {
         val endpointPOST = transitions.map {
-            Endpoint("${it.label.value}POST", RequestMethod.POST, it.data.map { itt ->
-                Prop(itt.id)
-            })
+            Endpoint("${it.label.value}POST", RequestMethod.POST, it.data
+                    .filter { itt -> itt.logic.behavior.contains(Behavior.EDITABLE) }
+                    .map { itt ->
+                        Prop(itt.id,
+                                itt.logic.behavior.contains(Behavior.EDITABLE) && itt.logic.behavior.contains(Behavior.REQUIRED))
+                    })
         }
+                .filter { it.props.isNotEmpty() }
 
-        val functions2 = endpointPOST.map { endpoint ->
+        return endpointPOST.map { endpoint ->
 
             val fs = FunSpec.builder(endpoint.id)
                     .addAnnotation(AnnotationSpec.builder(PostMapping::class)
                             .addMember("\"$className/${endpoint.id}\"")
                             .build())
-                    .addStatement("return \"Helloworld\"")
+                    .addStatement("print( \"not implemented\")")
             endpoint.props.forEach { param ->
+                val ann = AnnotationSpec.builder(RequestParam::class)
+                        .addMember("value = \"${param.name}\"")
+                if (!param.required) {
+                    ann.addMember("defaultValue = \"\"")
+                }
                 val par = ParameterSpec
-                        .builder(param.name, param.type)
-                        .addAnnotation(RequestParam::class)
+                        .builder(param.name, String::class)
+                        .addAnnotation(ann.build())
                         .build()
                 fs.addParameter(par)
 
             }
-
             fs.build()
+        }
+    }
+
+
+    fun generateGetEndpoints(transitions: List<ComputedTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
+        val endpointGET = transitions.map {
+            Endpoint("${it.label.value}GET", RequestMethod.POST, it.data
+                    .filter { itt -> itt.logic.behavior.contains(Behavior.VISIBLE) }
+                    .map { itt ->
+                        Prop(itt.id, false)
+                    })
+        }
+                .filter { it.props.isNotEmpty() }
+
+        val result = endpointGET.map { endpoint ->
+            val returnObjectName = "${endpoint.id}Result"
+            val returnObjectParams = endpoint.props.map {
+                ParameterSpec
+                        .builder(it.name, String::class)
+                        .defaultValue("\"\"")
+                        .build()
+            }
+
+            val obj = TypeSpec.classBuilder(returnObjectName)
+                    .primaryConstructor(FunSpec.constructorBuilder()
+                            .addParameters(returnObjectParams)
+                            .build())
+                    .build()
+
+
+            val fs = FunSpec.builder(endpoint.id)
+                    .addAnnotation(AnnotationSpec.builder(GetMapping::class)
+                            .addMember("\"$className/${endpoint.id}\"")
+                            .build())
+                    .returns(obj::class)
+                    .addStatement("return $returnObjectName()")
+
+            val fn = fs.build()
+
+            Pair(fn, obj)
         }
 
 
+
+        return Pair(result.map { it.first }, result.map { it.second })
+    }
+
+
+    fun generateClass(transitions: List<ComputedTransition>, className: String): String {
+        val endpointsGET = generateGetEndpoints(transitions, className)
+
+
+        val postFunctions = generatePostFunctions(transitions, className)
+
+
         val newClass = TypeSpec.classBuilder(className)
-                .addFunctions(functions.union(functions2))
+                .addFunctions(postFunctions.union(endpointsGET.first))
+                .addTypes(endpointsGET.second)
                 .addAnnotation(RestController::class)
                 .addAnnotation(EnableResourceServer::class)
                 .build()
@@ -146,24 +176,19 @@ class Generator {
 
 
         try {
-            val localRepo = FileRepository("./endpoint-shell/.git")
-            val git = Git(localRepo)
-
-            val pullCmd = git.pull()
-            pullCmd.call()
-
+            val repo = Git(FileRepository("./endpoint-shell/.git"))
+            repo.add().call()
+            repo.reset()
+                    .setMode(ResetCommand.ResetType.HARD)
+                    .setRef("origin/master").call()
 
         } catch (ex: GitAPIException) {
             File("./endpoint-shell").deleteRecursively()
             Git.cloneRepository()
                     .setURI("https://github.com/TheYurry/dp_endpoint.git")
                     .setDirectory(File("./endpoint-shell"))
-                    .setBranch("master")
-                    .call()
-
+                    .setBranch("master").call()
         }
-
-
     }
 
 
@@ -184,20 +209,20 @@ class Generator {
             var ps = Runtime.getRuntime()
                     .exec("./gradlew build", null, File("./endpoint-shell"))
             ps.waitFor()
-//            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
+            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
+            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
 
             ps = Runtime.getRuntime()
                     .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File("./endpoint-shell"))
-//            ps.waitFor(30,TimeUnit.SECONDS)
-//            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
-//            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
+            ps.waitFor(30, TimeUnit.SECONDS)
+            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
             endpointProcesses.add(ps)
 
         }
 
 
     }
-
 
 }
 

@@ -25,8 +25,10 @@ import kotlin.reflect.KClass
 import kotlin.reflect.jvm.internal.impl.load.java.lazy.ContextKt.child
 import java.io.InputStreamReader
 import java.io.BufferedReader
+import java.net.URL
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.annotation.security.RolesAllowed
 
 
 data class Prop(
@@ -36,7 +38,8 @@ data class Prop(
 data class Endpoint(
         val id: String,
         var method: RequestMethod,
-        var props: List<Prop>)
+        var props: List<Prop>,
+        var roles: List<String>)
 
 
 @Controller
@@ -80,32 +83,46 @@ class Generator {
     fun registerRoles(roles: List<Role>) {
 
 
-        val restTemplate = RestTemplate()
-        val role = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", String::class.java)
-        roles.map{
-            restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", String::class.java)
-        }
+//        val restTemplate = RestTemplate()
+//        val role = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", String::class.java)
+//        URL("http://localhost:8088/clearRoles").readText()
+//        roles.map {
+//            URL("http://localhost:8088/addRole?role=").readText()
+//        }
 
     }
 
 
     fun generatePostFunctions(transitions: List<ComputedTransition>, className: String): List<FunSpec> {
         val endpointPOST = transitions.map {
-            Endpoint(it.id, RequestMethod.POST, it.data
+            val props = it.data
                     .filter { itt -> itt.logic.behavior.contains(Behavior.EDITABLE) }
                     .map { itt ->
                         Prop(itt.id,
                                 itt.logic.behavior.contains(Behavior.EDITABLE) && itt.logic.behavior.contains(Behavior.REQUIRED))
-                    })
+                    }
+
+            val roles = it.rolesPerform.map { itt ->
+                "ROLE_${className.toUpperCase()}_${itt.toUpperCase()}"
+            }.toList()
+
+            Endpoint(it.id, RequestMethod.POST, props, roles)
         }
                 .filter { it.props.isNotEmpty() }
 
         return endpointPOST.map { endpoint ->
 
+            val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
+            endpoint.roles.forEach {
+                rolesAnnotation.addMember("\"$it\"")
+            }
+
+
             val fs = FunSpec.builder("post${endpoint.id}")
                     .addAnnotation(AnnotationSpec.builder(PostMapping::class)
                             .addMember("\"$className/${endpoint.id}\"")
                             .build())
+                    .addAnnotation(rolesAnnotation.build())
                     .addStatement("print( \"not implemented\")")
             endpoint.props.forEach { param ->
                 val ann = AnnotationSpec.builder(RequestParam::class)
@@ -127,11 +144,16 @@ class Generator {
 
     fun generateGetEndpoints(transitions: List<ComputedTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
         val endpointGET = transitions.map {
-            Endpoint(it.id, RequestMethod.POST, it.data
+            val props = it.data
                     .filter { itt -> itt.logic.behavior.contains(Behavior.VISIBLE) }
-                    .map { itt ->
-                        Prop(itt.id, false)
-                    })
+                    .map { itt -> Prop(itt.id, false) }
+
+            val roles = it.rolesView.map { itt ->
+                "ROLE_${className.toUpperCase()}_${itt.toUpperCase()}"
+            }.toList()
+
+
+            Endpoint(it.id, RequestMethod.POST, props, roles)
         }
                 .filter { it.props.isNotEmpty() }
 
@@ -150,11 +172,17 @@ class Generator {
                             .build())
                     .build()
 
+            val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
+            endpoint.roles.forEach {
+                rolesAnnotation.addMember("\"$it\"")
+            }
+
 
             val fs = FunSpec.builder("get${endpoint.id}")
                     .addAnnotation(AnnotationSpec.builder(GetMapping::class)
                             .addMember("\"$className/${endpoint.id}\"")
                             .build())
+                    .addAnnotation(rolesAnnotation.build())
                     .addStatement("return $returnObjectName()")
 
             val fn = fs.build()
@@ -235,9 +263,9 @@ class Generator {
 
             ps = Runtime.getRuntime()
                     .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File("./endpoint-shell"))
-            ps.waitFor(30, TimeUnit.SECONDS)
             print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
             print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
+            ps.waitFor(10, TimeUnit.SECONDS)
             endpointProcesses.add(ps)
 
         }

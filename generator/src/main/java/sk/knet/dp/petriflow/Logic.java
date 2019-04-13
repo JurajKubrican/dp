@@ -8,9 +8,9 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -27,24 +27,22 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "perform",
-    "delegate",
-    "view",
-    "behavior",
-    "action",
-    "actionRef"
+        "perform",
+        "delegate",
+        "view",
+        "behavior",
+        "action",
+        "actionRef"
 })
 @XmlRootElement(name = "logic")
 public class Logic {
 
-    protected Boolean perform;
-    protected Boolean delegate;
-    protected Boolean view;
+    protected Boolean perform = false;
+    protected Boolean delegate = false;
+    protected Boolean view = false;
     @XmlSchemaType(name = "string")
     protected List<Behavior> behavior;
     protected List<ActionType> action;
@@ -52,11 +50,9 @@ public class Logic {
 
     /**
      * Gets the value of the perform property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     * {@link Boolean }
      */
     public Boolean isPerform() {
         return perform;
@@ -64,11 +60,9 @@ public class Logic {
 
     /**
      * Sets the value of the perform property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setPerform(Boolean value) {
         this.perform = value;
@@ -76,11 +70,9 @@ public class Logic {
 
     /**
      * Gets the value of the delegate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     * {@link Boolean }
      */
     public Boolean isDelegate() {
         return delegate;
@@ -88,11 +80,9 @@ public class Logic {
 
     /**
      * Sets the value of the delegate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setDelegate(Boolean value) {
         this.delegate = value;
@@ -100,11 +90,9 @@ public class Logic {
 
     /**
      * Gets the value of the view property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     * {@link Boolean }
      */
     public Boolean isView() {
         return view;
@@ -112,11 +100,9 @@ public class Logic {
 
     /**
      * Sets the value of the view property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setView(Boolean value) {
         this.view = value;
@@ -124,25 +110,23 @@ public class Logic {
 
     /**
      * Gets the value of the behavior property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the behavior property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getBehavior().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Behavior }
-     * 
-     * 
      */
     public List<Behavior> getBehavior() {
         if (behavior == null) {
@@ -153,25 +137,23 @@ public class Logic {
 
     /**
      * Gets the value of the action property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the action property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAction().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ActionType }
-     * 
-     * 
      */
     public List<ActionType> getAction() {
         if (action == null) {
@@ -182,25 +164,23 @@ public class Logic {
 
     /**
      * Gets the value of the actionRef property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the actionRef property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getActionRef().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ActionRefType }
-     * 
-     * 
      */
     public List<ActionRefType> getActionRef() {
         if (actionRef == null) {

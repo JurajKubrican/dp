@@ -7,7 +7,8 @@ import sk.knet.dp.petriflow.Transition
 
 class ComputedTransition(t: Transition) : Transition() {
 
-    var authorized: Set<String> = emptySet()
+    var rolesView: Set<String> = emptySet()
+    var rolesPerform: Set<String> = emptySet()
     var data: List<DataRef> = emptyList()
 
     init {
@@ -18,9 +19,16 @@ class ComputedTransition(t: Transition) : Transition() {
         label = label ?: placeholderLabel
 
 
-        authorized = t.roleRef
+        rolesView = t.roleRef
+                .filter { (it.logic.isView || it.logic.isPerform) }
                 .map(RoleRef::getId)
                 .toSet()
+
+        rolesPerform = t.roleRef
+                .filter { it.logic.isPerform!! }
+                .map(RoleRef::getId)
+                .toSet()
+
 
         data = t.dataGroup
                 .map { it.dataRef }

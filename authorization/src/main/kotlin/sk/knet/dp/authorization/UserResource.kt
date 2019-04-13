@@ -20,20 +20,32 @@ class UserResource {
     }
 
 
-    @PostMapping("/user")
+    @PostMapping("/val")
     @ResponseBody
     fun postUser(
-            @RequestParam("client") clientName: String,
-            @RequestParam("role") role: String,
+            @RequestParam("client") client: String,
+            @RequestParam("user") user: String,
             @RequestParam("pass") pass: String
-    ) {
+    ): String {
 
-        userDetailStore.manager.createUser(
-                userDetailStore.users.username(clientName + "_" + role)
-                        .password(pass)
-                        .roles(clientName + "_" + role)
-                        .build())
-        print(userDetailStore.manager)
+        val roleName = "${client.toUpperCase()}_${user.toUpperCase()}"
+
+        if (userDetailStore.manager.userExists(user)) {
+            userDetailStore.manager.updatePassword(
+                    userDetailStore.manager.loadUserByUsername(user),
+                    pass
+            )
+        } else {
+            userDetailStore.manager.createUser(
+                    userDetailStore.users.username(user)
+                            .password(pass)
+                            .roles(roleName)
+                            .build())
+
+            print(userDetailStore.manager.loadUserByUsername(user))
+        }
+
+        return "ROLE_$roleName"
     }
 
 }

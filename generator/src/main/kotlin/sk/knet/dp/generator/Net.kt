@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBContext
 class Net(f: String) {
 
     var computedTransitions: List<ComputedTransition>
-    var roles: Map<String, Role>
+    var roles: List<Role>
     var document: Document
 
     init {
@@ -19,8 +19,6 @@ class Net(f: String) {
                 .toList()
 
         roles = document.role
-                .map { it.id to it }
-                .toMap()
     }
 
 

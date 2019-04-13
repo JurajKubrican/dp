@@ -17,8 +17,10 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
+import org.springframework.web.client.RestTemplate
 import org.springframework.web.multipart.MultipartFile
 import sk.knet.dp.petriflow.Behavior
+import sk.knet.dp.petriflow.Role
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.internal.impl.load.java.lazy.ContextKt.child
 import java.io.InputStreamReader
@@ -60,10 +62,13 @@ class Generator {
 
         val transitions = n.computedTransitions
 
+        val roles = n.roles
+
+        registerRoles(roles)
 
         prepareShell()
 
-        val classFile = generateClass(transitions, clientName)
+        val classFile = generateClass(transitions, clientName, roles)
         writeClass(classFile, clientName)
 
 
@@ -71,9 +76,22 @@ class Generator {
 
     }
 
+
+    fun registerRoles(roles: List<Role>) {
+
+
+        val restTemplate = RestTemplate()
+        val role = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", String::class.java)
+        roles.map{
+            restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", String::class.java)
+        }
+
+    }
+
+
     fun generatePostFunctions(transitions: List<ComputedTransition>, className: String): List<FunSpec> {
         val endpointPOST = transitions.map {
-            Endpoint("${it.label.value}POST", RequestMethod.POST, it.data
+            Endpoint(it.id, RequestMethod.POST, it.data
                     .filter { itt -> itt.logic.behavior.contains(Behavior.EDITABLE) }
                     .map { itt ->
                         Prop(itt.id,
@@ -84,7 +102,7 @@ class Generator {
 
         return endpointPOST.map { endpoint ->
 
-            val fs = FunSpec.builder(endpoint.id)
+            val fs = FunSpec.builder("post${endpoint.id}")
                     .addAnnotation(AnnotationSpec.builder(PostMapping::class)
                             .addMember("\"$className/${endpoint.id}\"")
                             .build())
@@ -109,7 +127,7 @@ class Generator {
 
     fun generateGetEndpoints(transitions: List<ComputedTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
         val endpointGET = transitions.map {
-            Endpoint("${it.label.value}GET", RequestMethod.POST, it.data
+            Endpoint(it.id, RequestMethod.POST, it.data
                     .filter { itt -> itt.logic.behavior.contains(Behavior.VISIBLE) }
                     .map { itt ->
                         Prop(itt.id, false)
@@ -118,7 +136,7 @@ class Generator {
                 .filter { it.props.isNotEmpty() }
 
         val result = endpointGET.map { endpoint ->
-            val returnObjectName = "${endpoint.id}Result"
+            val returnObjectName = "get${endpoint.id}Result"
             val returnObjectParams = endpoint.props.map {
                 ParameterSpec
                         .builder(it.name, String::class)
@@ -133,11 +151,10 @@ class Generator {
                     .build()
 
 
-            val fs = FunSpec.builder(endpoint.id)
+            val fs = FunSpec.builder("get${endpoint.id}")
                     .addAnnotation(AnnotationSpec.builder(GetMapping::class)
                             .addMember("\"$className/${endpoint.id}\"")
                             .build())
-                    .returns(obj::class)
                     .addStatement("return $returnObjectName()")
 
             val fn = fs.build()
@@ -151,7 +168,11 @@ class Generator {
     }
 
 
-    fun generateClass(transitions: List<ComputedTransition>, className: String): String {
+    fun generateClass(
+            transitions: List<ComputedTransition>,
+            className: String,
+            roles: List<Role>
+    ): String {
         val endpointsGET = generateGetEndpoints(transitions, className)
 
 

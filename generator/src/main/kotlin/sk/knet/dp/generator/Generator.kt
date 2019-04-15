@@ -17,6 +17,8 @@ import sk.knet.dp.petriflow.Role
 import java.io.InputStreamReader
 import java.io.BufferedReader
 import java.net.URL
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 import javax.annotation.security.RolesAllowed
 
@@ -58,7 +60,6 @@ class Generator {
         registerUsers(users.document.user, clientName)
 
 
-
         val modelFileName = fileStorage.store(modelFile)
         val n = NetReader("filestorage/$modelFileName")
         val transitions = n.computedTransitions
@@ -77,8 +78,12 @@ class Generator {
     fun registerUsers(users: List<sk.knet.dp.userschema.User>, clientName: String) {
 
         users.forEach {
-            val roles = it.role.map { itt-> "${clientName.toUpperCase()}_${itt.id.toUpperCase()}" }.toString()
-            URL("http://localhost:8088/addUser?username=${clientName}_${it.name}&password=${it.password}&roles=$roles").readText()
+            val roles = URLEncoder.encode(
+                    it.role.map { itt ->
+                        "${clientName.toUpperCase()}_${itt.id.toUpperCase()}"
+                    }.toString(),
+                    StandardCharsets.UTF_8.toString())
+            print(URL("http://localhost:8088/addUser?username=${clientName}_${it.name}&password=${it.password}&roles=$roles").readText())
         }
 
     }

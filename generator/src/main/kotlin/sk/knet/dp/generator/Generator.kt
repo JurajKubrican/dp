@@ -1,6 +1,7 @@
 package sk.knet.dp.generator
 
 import com.squareup.kotlinpoet.*
+import io.swagger.annotations.*
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ResetCommand
 import org.springframework.web.bind.annotation.*
@@ -39,7 +40,8 @@ data class Endpoint(
         val id: String,
         var method: RequestMethod,
         var props: List<Prop>,
-        var roles: List<String>)
+        var roles: List<String>,
+        val label: String)
 
 
 @Controller
@@ -106,7 +108,7 @@ class Generator {
                 "ROLE_${className.toUpperCase()}_${itt.toUpperCase()}"
             }.toList()
 
-            Endpoint(it.id, RequestMethod.POST, props, roles)
+            Endpoint(it.id, RequestMethod.POST, props, roles, it.label.value)
         }
                 .filter { it.props.isNotEmpty() }
 
@@ -116,6 +118,9 @@ class Generator {
             endpoint.roles.forEach {
                 rolesAnnotation.addMember("\"$it\"")
             }
+            val descriprionAnnotation = AnnotationSpec.builder(ApiOperation::class)
+            descriprionAnnotation.addMember("value = \"${endpoint.label}\"")
+            descriprionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
 
 
             val fs = FunSpec.builder("post${endpoint.id}")
@@ -123,6 +128,7 @@ class Generator {
                             .addMember("\"$className/${endpoint.id}\"")
                             .build())
                     .addAnnotation(rolesAnnotation.build())
+                    .addAnnotation(descriprionAnnotation.build())
                     .addStatement("print( \"not implemented\")")
             endpoint.props.forEach { param ->
                 val ann = AnnotationSpec.builder(RequestParam::class)
@@ -152,8 +158,7 @@ class Generator {
                 "ROLE_${className.toUpperCase()}_${itt.toUpperCase()}"
             }.toList()
 
-
-            Endpoint(it.id, RequestMethod.POST, props, roles)
+            Endpoint(it.id, RequestMethod.POST, props, roles, it.label.value)
         }
                 .filter { it.props.isNotEmpty() }
 
@@ -176,6 +181,9 @@ class Generator {
             endpoint.roles.forEach {
                 rolesAnnotation.addMember("\"$it\"")
             }
+            val descriprionAnnotation = AnnotationSpec.builder(ApiOperation::class)
+            descriprionAnnotation.addMember("value = \"${endpoint.label}\"")
+            descriprionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
 
 
             val fs = FunSpec.builder("get${endpoint.id}")
@@ -183,11 +191,11 @@ class Generator {
                             .addMember("\"$className/${endpoint.id}\"")
                             .build())
                     .addAnnotation(rolesAnnotation.build())
+                    .addAnnotation(descriprionAnnotation.build())
                     .addStatement("return $returnObjectName()")
 
-            val fn = fs.build()
 
-            Pair(fn, obj)
+            Pair(fs.build(), obj)
         }
 
 

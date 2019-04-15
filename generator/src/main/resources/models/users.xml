@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./users_schema.xsd">
+    <user name="admin" password="verySecureAdminPass">
+        <role id="client"/>
+        <role id="bureau_agent"/>
+        <role id="loan_officer"/>
+        <role id="underwriter"/>
+        <role id="property_appraiser"/>
+        <role id="account_clerk"/>
+    </user>
+    <user name="user1" password="verySecureUser1Pass">
+        <role id="bureau_agent"/>
+        <role id="underwriter"/>
+        <role id="account_clerk"/>
+    </user>
+    <user name="user2" password="verySecureUser2Pass">
+        <role id="client"/>
+        <role id="loan_officer"/>
+        <role id="property_appraiser"/>
+    </user>
+</document>

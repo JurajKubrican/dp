@@ -4,5 +4,6 @@ import org.springframework.web.multipart.MultipartFile
 
 interface FileStorage {
     fun store(file: MultipartFile): String
+    fun delete(fileName: String)
     fun init()
 }

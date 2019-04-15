@@ -24,6 +24,10 @@ class FileStorageImpl : FileStorage {
         return newFilename
     }
 
+    override fun delete(fileName: String) {
+        Files.delete(this.rootLocation.resolve(fileName))
+    }
+
     override fun init() {
         Files.createDirectory(rootLocation)
     }

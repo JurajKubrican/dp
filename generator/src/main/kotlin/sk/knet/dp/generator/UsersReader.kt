@@ -1,24 +1,19 @@
 package sk.knet.dp.generator
 
-import sk.knet.dp.petriflow.Document
-import sk.knet.dp.petriflow.Role
+
+import sk.knet.dp.userschema.Document
+import sk.knet.dp.userschema.User
 import java.io.File
 import javax.xml.bind.JAXBContext
 
-class Net(f: String) {
+class UsersReader(f: String) {
 
-    var computedTransitions: List<ComputedTransition>
-    var roles: List<Role>
     var document: Document
+    var users: List<User>
 
     init {
         document = loadFile(f)
-
-        computedTransitions = document.transition
-                .map { ComputedTransition(it) }
-                .toList()
-
-        roles = document.role
+        users = document.user
     }
 
 

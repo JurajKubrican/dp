@@ -1,6 +1,7 @@
 package sk.knet.dp.authorization
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -20,32 +21,30 @@ class UserResource {
     }
 
 
-    @PostMapping("/val")
+    @GetMapping("/addUser")
     @ResponseBody
-    fun postUser(
-            @RequestParam("client") client: String,
-            @RequestParam("user") user: String,
-            @RequestParam("pass") pass: String
-    ): String {
+    fun addUser(
+            @RequestParam("username") username: String,
+            @RequestParam("password") password: String,
+            @RequestParam("roles") roles: String
+    ): UserDetails? {
 
-        val roleName = "${client.toUpperCase()}_${user.toUpperCase()}"
+        val rolesList = roles.substringAfter("[").substringBeforeLast("]").split(", ")
 
-        if (userDetailStore.manager.userExists(user)) {
-            userDetailStore.manager.updatePassword(
-                    userDetailStore.manager.loadUserByUsername(user),
-                    pass
-            )
-        } else {
-            userDetailStore.manager.createUser(
-                    userDetailStore.users.username(user)
-                            .password(pass)
-                            .roles(roleName)
-                            .build())
 
-            print(userDetailStore.manager.loadUserByUsername(user))
+        if (userDetailStore.manager.userExists(username)) {
+            userDetailStore.manager.deleteUser(username)
         }
 
-        return "ROLE_$roleName"
+        val userBuilder = userDetailStore.users.username(username)
+                .password(password)
+
+        userBuilder.roles(*rolesList.toTypedArray())
+
+        userDetailStore.manager.createUser(userBuilder.build())
+
+
+        return userDetailStore.manager.loadUserByUsername(username)
     }
 
 }

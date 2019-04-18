@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.stereotype.Controller
 import org.springframework.web.multipart.MultipartFile
 import sk.knet.dp.petriflow.Behavior
+import sk.knet.dp.petriflow.DataType
 import sk.knet.dp.petriflow.Role
 import java.io.InputStreamReader
 import java.io.BufferedReader
@@ -25,7 +26,9 @@ import javax.annotation.security.RolesAllowed
 
 data class Prop(
         val name: String,
-        val required: Boolean)
+        val required: Boolean,
+        val type: DataType = DataType.BOOLEAN,
+        val enumValues: List<String>? = emptyList())
 
 data class Endpoint(
         val id: String,
@@ -62,7 +65,7 @@ class Generator {
 
         val modelFileName = fileStorage.store(modelFile)
         val n = NetReader("filestorage/$modelFileName")
-        val transitions = n.computedTransitions
+        val transitions = n.facadeTransitions
 
         prepareShell()
 
@@ -89,72 +92,162 @@ class Generator {
     }
 
 
-    fun generatePostFunctions(transitions: List<ComputedTransition>, className: String): List<FunSpec> {
-        val endpointPOST = transitions.map {
-            val props = it.data
-                    .filter { itt -> itt.logic.behavior.contains(Behavior.EDITABLE) }
-                    .map { itt ->
-                        Prop(itt.id,
-                                itt.logic.behavior.contains(Behavior.EDITABLE) && itt.logic.behavior.contains(Behavior.REQUIRED))
+    fun generatePostFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+//        Prep data
+        val endpointPOST = transitions
+                .map { transition ->
+                    val props = transition.data
+                            .filter { prop ->
+                                prop.logic.behavior.contains(Behavior.EDITABLE)
+                            }
+                            .map { prop ->
+                                val required = prop.logic.behavior.contains(Behavior.EDITABLE) && prop.logic.behavior.contains(Behavior.REQUIRED)
+
+                                Prop(prop.id,
+                                        required,
+                                        prop.type,
+                                        prop.values)
+                            }
+
+
+                    val roles = transition.rolesPerform
+                            .map { role ->
+                                "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
+                            }.toList()
+
+                    Endpoint(transition.id,
+                            RequestMethod.POST,
+                            props,
+                            roles,
+                            transition.label.value)
+                }
+                .filter {
+                    it.props.isNotEmpty()
+                }
+
+
+
+
+        return endpointPOST
+                .map { endpoint ->
+
+                    val statements = mutableListOf(
+                            "val errors = mutableListOf<String>()"
+                    )
+
+                    endpoint.props.forEach { prop ->
+                        var regex: String? = null
+                        when (prop.type) {
+                            DataType.BOOLEAN -> regex = """0|1|true|false"""
+                            DataType.TEXT -> regex = """.*"""
+                            DataType.DATE -> regex = """(\\d{4})-(\\d{2})-(\\d{2}))"""
+                            DataType.DATE_TIME -> regex = """(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2})\\:(\\d{2})\\:(\\d{2})[+-](\\d{2})\\:(\\d{2})"""
+                            DataType.NUMBER -> regex = """\\d+"""
+                            DataType.ENUMERATION -> regex = prop.enumValues!!.joinToString("|")
+                            DataType.MULTICHOICE -> regex = prop.enumValues!!.joinToString("|")
+                            else -> {
+
+                            }
+                        }
+                        if (regex != null) {
+
+                            statements.add(""" if (${
+                            if (!prop.required) {
+                                """${prop.name} !=  "" && """
+                            } else {
+                                ""
+                            }} !Regex("$regex").matches(${prop.name}) ) {
+                                errors.add("${prop.name}" +
+                                "should match $regex" )}""")
+                        }
                     }
 
-            val roles = it.rolesPerform.map { itt ->
-                "ROLE_${className.toUpperCase()}_${itt.toUpperCase()}"
-            }.toList()
-
-            Endpoint(it.id, RequestMethod.POST, props, roles, it.label.value)
-        }
-                .filter { it.props.isNotEmpty() }
-
-        return endpointPOST.map { endpoint ->
-
-            val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
-            endpoint.roles.forEach {
-                rolesAnnotation.addMember("\"$it\"")
-            }
-            val descriprionAnnotation = AnnotationSpec.builder(ApiOperation::class)
-            descriprionAnnotation.addMember("value = \"${endpoint.label}\"")
-            descriprionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
+                    if(statements.isNotEmpty())
 
 
-            val fs = FunSpec.builder("post${endpoint.id}")
-                    .addAnnotation(AnnotationSpec.builder(PostMapping::class)
-                            .addMember("\"$className/${endpoint.id}\"")
-                            .build())
-                    .addAnnotation(rolesAnnotation.build())
-                    .addAnnotation(descriprionAnnotation.build())
-                    .addStatement("print( \"not implemented\")")
-            endpoint.props.forEach { param ->
-                val ann = AnnotationSpec.builder(RequestParam::class)
-                        .addMember("value = \"${param.name}\"")
-                if (!param.required) {
-                    ann.addMember("defaultValue = \"\"")
+
+                    statements.add(""" if(errors.isNotEmpty()){
+                        |  return(errors.toString())
+                        |} """.trimMargin())
+
+
+                    // Annotations
+                    val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
+                    endpoint.roles
+                            .forEach {
+                                rolesAnnotation.addMember("\"$it\"")
+                            }
+
+                    val descriptionAnnotation = AnnotationSpec.builder(ApiOperation::class)
+                    descriptionAnnotation.addMember("value = \"${endpoint.label}\"")
+                    descriptionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
+
+
+                    //Function itself
+                    val fs = FunSpec.builder("post${endpoint.id}")
+                            .addAnnotation(AnnotationSpec.builder(PostMapping::class)
+                                    .addMember("\"$className/${endpoint.id}\"")
+                                    .build())
+                            .addAnnotation(rolesAnnotation.build())
+                            .addAnnotation(descriptionAnnotation.build())
+                            .returns(String::class)
+                    statements.map { stmt ->
+                        fs.addStatement(stmt)
+                    }
+                    fs.addStatement("""return "" """)
+
+
+                    endpoint.props
+                            .forEach { param ->
+                                val ann = AnnotationSpec.builder(RequestParam::class)
+                                        .addMember("value = \"${param.name}\"")
+                                if (!param.required) {
+                                    ann.addMember("defaultValue = \"\"")
+                                }
+                                val par = ParameterSpec
+                                        .builder(param.name,
+                                                when (param.type) {
+                                                    DataType.FILE -> MultipartFile::class
+                                                    else -> String::class
+
+                                                }
+                                        )
+
+                                        .addAnnotation(ann.build())
+                                fs.addParameter(par.build())
+
+                            }
+                    fs.build()
                 }
-                val par = ParameterSpec
-                        .builder(param.name, String::class)
-                        .addAnnotation(ann.build())
-                        .build()
-                fs.addParameter(par)
-
-            }
-            fs.build()
-        }
     }
 
 
-    fun generateGetEndpoints(transitions: List<ComputedTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
-        val endpointGET = transitions.map {
-            val props = it.data
-                    .filter { itt -> itt.logic.behavior.contains(Behavior.VISIBLE) }
-                    .map { itt -> Prop(itt.id, false) }
+    fun generateGetEndpoints(transitions: List<FacadeTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
+        val endpointGET = transitions
+                .map { transition ->
+                    val props = transition.data
+                            .filter { prop ->
+                                prop.logic.behavior.contains(Behavior.VISIBLE)
+                            }
+                            .map { prop ->
+                                Prop(prop.id, false)
+                            }
 
-            val roles = it.rolesView.map { itt ->
-                "ROLE_${className.toUpperCase()}_${itt.toUpperCase()}"
-            }.toList()
+                    val roles = transition.rolesView
+                            .map { role ->
+                                "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
+                            }.toList()
 
-            Endpoint(it.id, RequestMethod.POST, props, roles, it.label.value)
-        }
-                .filter { it.props.isNotEmpty() }
+
+                    Endpoint(transition.id,
+                            RequestMethod.POST,
+                            props,
+                            roles,
+                            transition.label.value)
+                }
+                .filter { transition ->
+                    transition.props.isNotEmpty()
+                }
 
         val result = endpointGET.map { endpoint ->
             val returnObjectName = "get${endpoint.id}Result"
@@ -165,19 +258,22 @@ class Generator {
                         .build()
             }
 
+            // Class
             val obj = TypeSpec.classBuilder(returnObjectName)
                     .primaryConstructor(FunSpec.constructorBuilder()
                             .addParameters(returnObjectParams)
                             .build())
                     .build()
 
+            // Annotations
             val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
-            endpoint.roles.forEach {
-                rolesAnnotation.addMember("\"$it\"")
+            endpoint.roles.forEach { role ->
+                rolesAnnotation.addMember("\"$role\"")
             }
-            val descriprionAnnotation = AnnotationSpec.builder(ApiOperation::class)
-            descriprionAnnotation.addMember("value = \"${endpoint.label}\"")
-            descriprionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
+
+            val descriptionAnnotation = AnnotationSpec.builder(ApiOperation::class)
+            descriptionAnnotation.addMember("value = \"${endpoint.label}\"")
+            descriptionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
 
 
             val fs = FunSpec.builder("get${endpoint.id}")
@@ -185,7 +281,7 @@ class Generator {
                             .addMember("\"$className/${endpoint.id}\"")
                             .build())
                     .addAnnotation(rolesAnnotation.build())
-                    .addAnnotation(descriprionAnnotation.build())
+                    .addAnnotation(descriptionAnnotation.build())
                     .addStatement("return $returnObjectName()")
 
 
@@ -193,13 +289,12 @@ class Generator {
         }
 
 
-
         return Pair(result.map { it.first }, result.map { it.second })
     }
 
 
     fun generateClass(
-            transitions: List<ComputedTransition>,
+            transitions: List<FacadeTransition>,
             className: String,
             roles: List<Role>
     ): String {
@@ -216,7 +311,8 @@ class Generator {
                 .addAnnotation(EnableResourceServer::class)
                 .build()
 
-        val fileSpec = FileSpec.builder("sk.knet.dp.endpointshell", className)
+        val fileSpec = FileSpec
+                .builder("sk.knet.dp.endpointshell", className)
                 .addType(newClass)
 
         return fileSpec.build().toString()
@@ -276,5 +372,4 @@ class Generator {
     }
 
 }
-
 

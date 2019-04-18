@@ -7,15 +7,16 @@ import javax.xml.bind.JAXBContext
 
 class NetReader(f: String) {
 
-    var computedTransitions: List<ComputedTransition>
+    var facadeTransitions: List<FacadeTransition>
     var roles: List<Role>
     var document: Document
 
     init {
         document = loadFile(f)
 
-        computedTransitions = document.transition
-                .map { ComputedTransition(it) }
+
+        facadeTransitions = document.transition
+                .map { FacadeTransition(it, document.data) }
                 .toList()
 
         roles = document.role

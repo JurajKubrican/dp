@@ -1,15 +1,12 @@
 package sk.knet.dp.generator
 
-import sk.knet.dp.petriflow.DataRef
-import sk.knet.dp.petriflow.I18NStringType
-import sk.knet.dp.petriflow.RoleRef
-import sk.knet.dp.petriflow.Transition
+import sk.knet.dp.petriflow.*
 
-class ComputedTransition(t: Transition) : Transition() {
+class FacadeTransition(t: Transition, dataIn: List<Data>) : Transition() {
 
     var rolesView: Set<String> = emptySet()
     var rolesPerform: Set<String> = emptySet()
-    var data: List<DataRef> = emptyList()
+    var data: List<FacadeData> = emptyList()
 
     init {
         id = t.id
@@ -35,7 +32,10 @@ class ComputedTransition(t: Transition) : Transition() {
                 .filter { it != null }
                 .flatten()
                 .union(t.dataRef)
-                .toList()
+                .toList().map { dataRef ->
+                    val dataField = dataIn.find { itt -> itt.id == dataRef.id }!!
+                    FacadeData(dataField.id, dataRef.logic, dataField.type, dataField.values.map { it.value })
+                }
 
     }
 

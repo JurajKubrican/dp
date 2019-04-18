@@ -59,7 +59,7 @@
     </data>
     <data type="boolean">
         <id>calc</id>
-        <action trigger="set">
+        <action trigger="set" >
             income: f.income,
             loan: f.loan_amount,
             q1: f.question_mortgage_lates,

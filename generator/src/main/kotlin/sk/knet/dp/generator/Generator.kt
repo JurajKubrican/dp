@@ -10,11 +10,10 @@ import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
-import org.springframework.stereotype.Controller
+import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import sk.knet.dp.petriflow.Behavior
 import sk.knet.dp.petriflow.DataType
-import sk.knet.dp.petriflow.Role
 import java.io.InputStreamReader
 import java.io.BufferedReader
 import java.net.URL
@@ -37,40 +36,42 @@ data class Endpoint(
         var roles: List<String>,
         val label: String)
 
-
-@Controller
-@EnableResourceServer
+@Service
 class Generator {
 
-    val endpointProcesses: MutableList<Process> = mutableListOf()
+    private val endpointProcesses: MutableList<Process> = mutableListOf()
 
     @Autowired
     lateinit var fileStorage: FileStorage
 
 
-    @PostMapping("/register")
-    final fun registerClient(
-            @RequestParam(value = "model") modelFile: MultipartFile,
-            @RequestParam(value = "users") usersFile: MultipartFile,
-            @RequestParam(value = "clientname") clientName: String): String {
+    fun generateClients(): String {
 
-
-        val usersFileName = fileStorage.store(usersFile)
-
-        val users = UsersReader("filestorage/$usersFileName")
-
-
-        registerUsers(users.document.user, clientName)
-
-
-        val modelFileName = fileStorage.store(modelFile)
-        val n = NetReader("filestorage/$modelFileName")
-        val transitions = n.facadeTransitions
-
+        val files = fileStorage.listDir() ?: return "no clients"
         prepareShell()
 
-        val classFile = generateClass(transitions, clientName, n.roles)
-        writeClass(classFile, clientName)
+        files.filter {
+            Regex("^Users.*").matches(it.fileName.toString())
+        }.forEach {
+            val users = UsersReader(it.toString())
+            registerUsers(users.document.user, it.fileName.toString().substring(5))
+        }
+
+
+
+        files.filter {
+            Regex("^Client.*").matches(it.fileName.toString())
+        }.forEach {
+            val clientName = it.fileName.toString().substring(6)
+            val n = NetReader(it.toString())
+            val transitions = n.facadeTransitions
+            val classFile = generateClass(transitions, clientName)
+            writeClass(classFile, clientName)
+        }
+
+
+
+
 
 
         return "done"
@@ -92,7 +93,7 @@ class Generator {
     }
 
 
-    fun generatePostFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+    private fun generatePostFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
 //        Prep data
         val endpointPOST = transitions
                 .map { transition ->
@@ -162,11 +163,10 @@ class Generator {
                         }
                     }
 
-                    if(statements.isNotEmpty())
+                    if (statements.isNotEmpty())
 
 
-
-                    statements.add(""" if(errors.isNotEmpty()){
+                        statements.add(""" if(errors.isNotEmpty()){
                         |  return(errors.toString())
                         |} """.trimMargin())
 
@@ -222,7 +222,7 @@ class Generator {
     }
 
 
-    fun generateGetEndpoints(transitions: List<FacadeTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
+    private fun generateGetEndpoints(transitions: List<FacadeTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
         val endpointGET = transitions
                 .map { transition ->
                     val props = transition.data
@@ -293,10 +293,9 @@ class Generator {
     }
 
 
-    fun generateClass(
+    private fun generateClass(
             transitions: List<FacadeTransition>,
-            className: String,
-            roles: List<Role>
+            className: String
     ): String {
         val endpointsGET = generateGetEndpoints(transitions, className)
 
@@ -319,15 +318,17 @@ class Generator {
     }
 
 
-    fun prepareShell() {
+    private fun prepareShell() {
 
 
         try {
             val repo = Git(FileRepository("./endpoint-shell/.git"))
-            repo.add().call()
+            repo.stashCreate().call()
             repo.reset()
                     .setMode(ResetCommand.ResetType.HARD)
                     .setRef("origin/master").call()
+            repo.stashApply().call()
+
 
         } catch (ex: GitAPIException) {
             File("./endpoint-shell").deleteRecursively()
@@ -339,7 +340,7 @@ class Generator {
     }
 
 
-    fun writeClass(classString: String, clientName: String) {
+    private fun writeClass(classString: String, clientName: String) {
         File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/$clientName.kt")
                 .writeText(classString)
 

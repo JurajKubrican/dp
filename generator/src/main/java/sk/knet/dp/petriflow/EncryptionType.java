@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.*;
@@ -6,9 +5,9 @@ import javax.xml.bind.annotation.*;
 
 /**
  * <p>Java class for encryptionType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="encryptionType">
  *   &lt;simpleContent>
@@ -18,12 +17,10 @@ import javax.xml.bind.annotation.*;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "encryptionType", propOrder = {
-    "value"
+        "value"
 })
 public class EncryptionType {
 
@@ -35,7 +32,6 @@ public class EncryptionType {
 
     /**
      * Gets the value of the value property.
-     * 
      */
     public boolean isValue() {
         return value;
@@ -43,7 +39,6 @@ public class EncryptionType {
 
     /**
      * Sets the value of the value property.
-     * 
      */
     public void setValue(boolean value) {
         this.value = value;
@@ -51,11 +46,9 @@ public class EncryptionType {
 
     /**
      * Gets the value of the algorithm property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getAlgorithm() {
         return algorithm;
@@ -63,11 +56,9 @@ public class EncryptionType {
 
     /**
      * Sets the value of the algorithm property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAlgorithm(String value) {
         this.algorithm = value;

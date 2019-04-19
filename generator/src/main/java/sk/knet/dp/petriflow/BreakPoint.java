@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -9,9 +8,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -24,13 +23,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "x",
-    "y"
+        "x",
+        "y"
 })
 @XmlRootElement(name = "breakPoint")
 public class BreakPoint {
@@ -40,7 +37,6 @@ public class BreakPoint {
 
     /**
      * Gets the value of the x property.
-     * 
      */
     public short getX() {
         return x;
@@ -48,7 +44,6 @@ public class BreakPoint {
 
     /**
      * Sets the value of the x property.
-     * 
      */
     public void setX(short value) {
         this.x = value;
@@ -56,7 +51,6 @@ public class BreakPoint {
 
     /**
      * Gets the value of the y property.
-     * 
      */
     public short getY() {
         return y;
@@ -64,7 +58,6 @@ public class BreakPoint {
 
     /**
      * Sets the value of the y property.
-     * 
      */
     public void setY(short value) {
         this.y = value;

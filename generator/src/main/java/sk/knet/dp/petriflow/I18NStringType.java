@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.*;
@@ -6,9 +5,9 @@ import javax.xml.bind.annotation.*;
 
 /**
  * <p>Java class for i18nStringType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="i18nStringType">
  *   &lt;simpleContent>
@@ -18,12 +17,10 @@ import javax.xml.bind.annotation.*;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "i18nStringType", propOrder = {
-    "value"
+        "value"
 })
 public class I18NStringType {
 
@@ -34,11 +31,9 @@ public class I18NStringType {
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getValue() {
         return value;
@@ -46,11 +41,9 @@ public class I18NStringType {
 
     /**
      * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setValue(String value) {
         this.value = value;
@@ -58,11 +51,9 @@ public class I18NStringType {
 
     /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getName() {
         return name;
@@ -70,11 +61,9 @@ public class I18NStringType {
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setName(String value) {
         this.name = value;

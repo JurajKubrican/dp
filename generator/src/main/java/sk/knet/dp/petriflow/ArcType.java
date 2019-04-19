@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.XmlEnum;
@@ -8,7 +7,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for arc_type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
@@ -22,7 +21,6 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
- * 
  */
 @XmlType(name = "arc_type")
 @XmlEnum
@@ -44,17 +42,17 @@ public enum ArcType {
         value = v;
     }
 
-    public String value() {
-        return value;
-    }
-
     public static ArcType fromValue(String v) {
-        for (ArcType c: ArcType.values()) {
+        for (ArcType c : ArcType.values()) {
             if (c.value.equals(v)) {
                 return c;
             }
         }
         throw new IllegalArgumentException(v);
+    }
+
+    public String value() {
+        return value;
     }
 
 }

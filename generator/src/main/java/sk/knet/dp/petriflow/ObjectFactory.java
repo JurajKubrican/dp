@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.JAXBElement;
@@ -8,18 +7,17 @@ import javax.xml.namespace.QName;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
  * generated in the petriflow package.
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * <p>An ObjectFactory allows you to programatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -67,14 +65,12 @@ public class ObjectFactory {
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: petriflow
-     * 
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link Data }
-     * 
      */
     public Data createData() {
         return new Data();
@@ -82,7 +78,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link I18NStringType }
-     * 
      */
     public I18NStringType createI18NStringType() {
         return new I18NStringType();
@@ -90,7 +85,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link EncryptionType }
-     * 
      */
     public EncryptionType createEncryptionType() {
         return new EncryptionType();
@@ -98,7 +92,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ActionType }
-     * 
      */
     public ActionType createActionType() {
         return new ActionType();
@@ -106,7 +99,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ActionRefType }
-     * 
      */
     public ActionRefType createActionRefType() {
         return new ActionRefType();
@@ -114,7 +106,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DocumentRef }
-     * 
      */
     public DocumentRef createDocumentRef() {
         return new DocumentRef();
@@ -122,7 +113,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link BreakPoint }
-     * 
      */
     public BreakPoint createBreakPoint() {
         return new BreakPoint();
@@ -130,7 +120,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DataRef }
-     * 
      */
     public DataRef createDataRef() {
         return new DataRef();
@@ -138,7 +127,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Logic }
-     * 
      */
     public Logic createLogic() {
         return new Logic();
@@ -146,7 +134,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Mapping }
-     * 
      */
     public Mapping createMapping() {
         return new Mapping();
@@ -154,7 +141,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link RoleRef }
-     * 
      */
     public RoleRef createRoleRef() {
         return new RoleRef();
@@ -162,7 +148,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link DataGroup }
-     * 
      */
     public DataGroup createDataGroup() {
         return new DataGroup();
@@ -170,7 +155,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Trigger }
-     * 
      */
     public Trigger createTrigger() {
         return new Trigger();
@@ -178,7 +162,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link I18N }
-     * 
      */
     public I18N createI18N() {
         return new I18N();
@@ -186,7 +169,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Actions }
-     * 
      */
     public Actions createActions() {
         return new Actions();
@@ -194,7 +176,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Role }
-     * 
      */
     public Role createRole() {
         return new Role();
@@ -202,7 +183,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Document }
-     * 
      */
     public Document createDocument() {
         return new Document();
@@ -210,7 +190,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Transaction }
-     * 
      */
     public Transaction createTransaction() {
         return new Transaction();
@@ -218,7 +197,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Transition }
-     * 
      */
     public Transition createTransition() {
         return new Transition();
@@ -226,7 +204,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link TransactionRef }
-     * 
      */
     public TransactionRef createTransactionRef() {
         return new TransactionRef();
@@ -234,7 +211,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Event }
-     * 
      */
     public Event createEvent() {
         return new Event();
@@ -242,7 +218,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Place }
-     * 
      */
     public Place createPlace() {
         return new Place();
@@ -250,7 +225,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Arc }
-     * 
      */
     public Arc createArc() {
         return new Arc();
@@ -258,7 +232,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "sourceId")
     public JAXBElement<String> createSourceId(String value) {
@@ -267,7 +240,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "multiplicity")
     public JAXBElement<Integer> createMultiplicity(Integer value) {
@@ -276,7 +248,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "isStatic")
     public JAXBElement<Boolean> createIsStatic(Boolean value) {
@@ -285,7 +256,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "values")
     public JAXBElement<I18NStringType> createValues(I18NStringType value) {
@@ -294,7 +264,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "icon")
     public JAXBElement<String> createIcon(String value) {
@@ -303,7 +272,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "title")
     public JAXBElement<I18NStringType> createTitle(I18NStringType value) {
@@ -312,7 +280,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "remote")
     public JAXBElement<String> createRemote(String value) {
@@ -321,7 +288,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "type")
     public JAXBElement<String> createType(String value) {
@@ -330,7 +296,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "destinationId")
     public JAXBElement<String> createDestinationId(String value) {
@@ -339,7 +304,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DataFocusPolicyType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "dataFocusPolicy")
     public JAXBElement<DataFocusPolicyType> createDataFocusPolicy(DataFocusPolicyType value) {
@@ -348,7 +312,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "valid")
     public JAXBElement<String> createValid(String value) {
@@ -357,7 +320,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "delegate")
     public JAXBElement<Boolean> createDelegate(Boolean value) {
@@ -366,7 +328,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "stretch")
     public JAXBElement<Boolean> createStretch(Boolean value) {
@@ -375,7 +336,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "view")
     public JAXBElement<Boolean> createView(Boolean value) {
@@ -384,7 +344,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link FinishPolicyType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "finishPolicy")
     public JAXBElement<FinishPolicyType> createFinishPolicy(FinishPolicyType value) {
@@ -393,7 +352,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link EncryptionType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "encryption")
     public JAXBElement<EncryptionType> createEncryption(EncryptionType value) {
@@ -402,7 +360,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ActionType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "action")
     public JAXBElement<ActionType> createAction(ActionType value) {
@@ -411,7 +368,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "caseName")
     public JAXBElement<I18NStringType> createCaseName(I18NStringType value) {
@@ -420,7 +376,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "tokens")
     public JAXBElement<Integer> createTokens(Integer value) {
@@ -429,7 +384,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "id")
     public JAXBElement<String> createId(String value) {
@@ -438,7 +392,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "placeholder")
     public JAXBElement<I18NStringType> createPlaceholder(I18NStringType value) {
@@ -447,7 +400,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "init")
     public JAXBElement<String> createInit(String value) {
@@ -456,7 +408,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "static")
     public JAXBElement<Boolean> createStatic(Boolean value) {
@@ -465,7 +416,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "defaultRole", defaultValue = "true")
     public JAXBElement<Boolean> createDefaultRole(Boolean value) {
@@ -474,7 +424,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "initials")
     public JAXBElement<String> createInitials(String value) {
@@ -483,7 +432,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "transitionRef")
     public JAXBElement<String> createTransitionRef(String value) {
@@ -492,7 +440,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "perform")
     public JAXBElement<Boolean> createPerform(Boolean value) {
@@ -501,7 +448,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "label")
     public JAXBElement<I18NStringType> createLabel(I18NStringType value) {
@@ -510,7 +456,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ActionRefType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "actionRef")
     public JAXBElement<ActionRefType> createActionRef(ActionRefType value) {
@@ -519,7 +464,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Integer }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "priority")
     public JAXBElement<Integer> createPriority(Integer value) {
@@ -528,7 +472,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "message")
     public JAXBElement<I18NStringType> createMessage(I18NStringType value) {
@@ -537,7 +480,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "version")
     public JAXBElement<String> createVersion(String value) {
@@ -546,7 +488,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "i18nString")
     public JAXBElement<I18NStringType> createI18NString(I18NStringType value) {
@@ -555,7 +496,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AssignPolicyType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "assignPolicy")
     public JAXBElement<AssignPolicyType> createAssignPolicy(AssignPolicyType value) {
@@ -564,7 +504,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Short }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "x")
     public JAXBElement<Short> createX(Short value) {
@@ -573,7 +512,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "name")
     public JAXBElement<I18NStringType> createName(I18NStringType value) {
@@ -582,7 +520,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Short }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "y")
     public JAXBElement<Short> createY(Short value) {
@@ -591,7 +528,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Boolean }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "transitionRole", defaultValue = "true")
     public JAXBElement<Boolean> createTransitionRole(Boolean value) {
@@ -600,7 +536,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DataGroupAlignment }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "alignment")
     public JAXBElement<DataGroupAlignment> createAlignment(DataGroupAlignment value) {
@@ -609,7 +544,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link I18NStringType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "desc")
     public JAXBElement<I18NStringType> createDesc(I18NStringType value) {

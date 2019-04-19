@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <role>
         <id>client</id>
         <name>Client</name>
@@ -59,7 +60,7 @@
     </data>
     <data type="boolean">
         <id>calc</id>
-        <action trigger="set" >
+        <action trigger="set">
             income: f.income,
             loan: f.loan_amount,
             q1: f.question_mortgage_lates,

@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.*;
@@ -8,9 +7,9 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -24,13 +23,11 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "action",
-    "actionRef"
+        "action",
+        "actionRef"
 })
 @XmlRootElement(name = "actions")
 public class Actions {
@@ -42,25 +39,23 @@ public class Actions {
 
     /**
      * Gets the value of the action property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the action property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAction().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ActionType }
-     * 
-     * 
      */
     public List<ActionType> getAction() {
         if (action == null) {
@@ -71,25 +66,23 @@ public class Actions {
 
     /**
      * Gets the value of the actionRef property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the actionRef property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getActionRef().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ActionRefType }
-     * 
-     * 
      */
     public List<ActionRefType> getActionRef() {
         if (actionRef == null) {
@@ -100,11 +93,9 @@ public class Actions {
 
     /**
      * Gets the value of the phase property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EventPhaseType }
-     *     
+     *
+     * @return possible object is
+     * {@link EventPhaseType }
      */
     public EventPhaseType getPhase() {
         return phase;
@@ -112,11 +103,9 @@ public class Actions {
 
     /**
      * Sets the value of the phase property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EventPhaseType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link EventPhaseType }
      */
     public void setPhase(EventPhaseType value) {
         this.phase = value;

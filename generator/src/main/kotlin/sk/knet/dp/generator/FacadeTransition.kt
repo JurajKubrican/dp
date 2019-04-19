@@ -1,6 +1,9 @@
 package sk.knet.dp.generator
 
-import sk.knet.dp.petriflow.*
+import sk.knet.dp.petriflow.Data
+import sk.knet.dp.petriflow.I18NStringType
+import sk.knet.dp.petriflow.RoleRef
+import sk.knet.dp.petriflow.Transition
 
 class FacadeTransition(t: Transition, dataIn: List<Data>) : Transition() {
 

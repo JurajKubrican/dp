@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.*;
@@ -8,9 +7,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -24,13 +23,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "exact",
-    "delay"
+        "exact",
+        "delay"
 })
 @XmlRootElement(name = "trigger")
 public class Trigger {
@@ -43,11 +40,9 @@ public class Trigger {
 
     /**
      * Gets the value of the exact property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
+     *
+     * @return possible object is
+     * {@link XMLGregorianCalendar }
      */
     public XMLGregorianCalendar getExact() {
         return exact;
@@ -55,11 +50,9 @@ public class Trigger {
 
     /**
      * Sets the value of the exact property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link XMLGregorianCalendar }
      */
     public void setExact(XMLGregorianCalendar value) {
         this.exact = value;
@@ -67,11 +60,9 @@ public class Trigger {
 
     /**
      * Gets the value of the delay property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Duration }
-     *     
+     *
+     * @return possible object is
+     * {@link Duration }
      */
     public Duration getDelay() {
         return delay;
@@ -79,11 +70,9 @@ public class Trigger {
 
     /**
      * Sets the value of the delay property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Duration }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Duration }
      */
     public void setDelay(Duration value) {
         this.delay = value;
@@ -91,11 +80,9 @@ public class Trigger {
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TriggerType }
-     *     
+     *
+     * @return possible object is
+     * {@link TriggerType }
      */
     public TriggerType getType() {
         return type;
@@ -103,11 +90,9 @@ public class Trigger {
 
     /**
      * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TriggerType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link TriggerType }
      */
     public void setType(TriggerType value) {
         this.type = value;

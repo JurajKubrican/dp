@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.XmlEnum;
@@ -8,7 +7,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for eventPhaseType.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
@@ -19,7 +18,6 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
- * 
  */
 @XmlType(name = "eventPhaseType")
 @XmlEnum
@@ -35,17 +33,17 @@ public enum EventPhaseType {
         value = v;
     }
 
-    public String value() {
-        return value;
-    }
-
     public static EventPhaseType fromValue(String v) {
-        for (EventPhaseType c: EventPhaseType.values()) {
+        for (EventPhaseType c : EventPhaseType.values()) {
             if (c.value.equals(v)) {
                 return c;
             }
         }
         throw new IllegalArgumentException(v);
+    }
+
+    public String value() {
+        return value;
     }
 
 }

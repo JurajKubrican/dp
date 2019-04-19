@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.*;
@@ -8,9 +7,9 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -36,26 +35,24 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "id",
-    "x",
-    "y",
-    "label",
-    "icon",
-    "priority",
-    "assignPolicy",
-    "dataFocusPolicy",
-    "finishPolicy",
-    "trigger",
-    "transactionRef",
-    "roleRef",
-    "dataRef",
-    "dataGroup",
-    "event"
+        "id",
+        "x",
+        "y",
+        "label",
+        "icon",
+        "priority",
+        "assignPolicy",
+        "dataFocusPolicy",
+        "finishPolicy",
+        "trigger",
+        "transactionRef",
+        "roleRef",
+        "dataRef",
+        "dataGroup",
+        "event"
 })
 @XmlRootElement(name = "transition")
 public class Transition {
@@ -83,11 +80,9 @@ public class Transition {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getId() {
         return id;
@@ -95,11 +90,9 @@ public class Transition {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -107,7 +100,6 @@ public class Transition {
 
     /**
      * Gets the value of the x property.
-     * 
      */
     public short getX() {
         return x;
@@ -115,7 +107,6 @@ public class Transition {
 
     /**
      * Sets the value of the x property.
-     * 
      */
     public void setX(short value) {
         this.x = value;
@@ -123,7 +114,6 @@ public class Transition {
 
     /**
      * Gets the value of the y property.
-     * 
      */
     public short getY() {
         return y;
@@ -131,7 +121,6 @@ public class Transition {
 
     /**
      * Sets the value of the y property.
-     * 
      */
     public void setY(short value) {
         this.y = value;
@@ -139,11 +128,9 @@ public class Transition {
 
     /**
      * Gets the value of the label property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @return possible object is
+     * {@link I18NStringType }
      */
     public I18NStringType getLabel() {
         return label;
@@ -151,11 +138,9 @@ public class Transition {
 
     /**
      * Sets the value of the label property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link I18NStringType }
      */
     public void setLabel(I18NStringType value) {
         this.label = value;
@@ -163,11 +148,9 @@ public class Transition {
 
     /**
      * Gets the value of the icon property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getIcon() {
         return icon;
@@ -175,11 +158,9 @@ public class Transition {
 
     /**
      * Sets the value of the icon property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setIcon(String value) {
         this.icon = value;
@@ -187,11 +168,9 @@ public class Transition {
 
     /**
      * Gets the value of the priority property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
+     *
+     * @return possible object is
+     * {@link Integer }
      */
     public Integer getPriority() {
         return priority;
@@ -199,11 +178,9 @@ public class Transition {
 
     /**
      * Sets the value of the priority property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Integer }
      */
     public void setPriority(Integer value) {
         this.priority = value;
@@ -211,11 +188,9 @@ public class Transition {
 
     /**
      * Gets the value of the assignPolicy property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link AssignPolicyType }
-     *     
+     *
+     * @return possible object is
+     * {@link AssignPolicyType }
      */
     public AssignPolicyType getAssignPolicy() {
         return assignPolicy;
@@ -223,11 +198,9 @@ public class Transition {
 
     /**
      * Sets the value of the assignPolicy property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link AssignPolicyType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link AssignPolicyType }
      */
     public void setAssignPolicy(AssignPolicyType value) {
         this.assignPolicy = value;
@@ -235,11 +208,9 @@ public class Transition {
 
     /**
      * Gets the value of the dataFocusPolicy property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DataFocusPolicyType }
-     *     
+     *
+     * @return possible object is
+     * {@link DataFocusPolicyType }
      */
     public DataFocusPolicyType getDataFocusPolicy() {
         return dataFocusPolicy;
@@ -247,11 +218,9 @@ public class Transition {
 
     /**
      * Sets the value of the dataFocusPolicy property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DataFocusPolicyType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link DataFocusPolicyType }
      */
     public void setDataFocusPolicy(DataFocusPolicyType value) {
         this.dataFocusPolicy = value;
@@ -259,11 +228,9 @@ public class Transition {
 
     /**
      * Gets the value of the finishPolicy property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FinishPolicyType }
-     *     
+     *
+     * @return possible object is
+     * {@link FinishPolicyType }
      */
     public FinishPolicyType getFinishPolicy() {
         return finishPolicy;
@@ -271,11 +238,9 @@ public class Transition {
 
     /**
      * Sets the value of the finishPolicy property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FinishPolicyType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link FinishPolicyType }
      */
     public void setFinishPolicy(FinishPolicyType value) {
         this.finishPolicy = value;
@@ -283,25 +248,23 @@ public class Transition {
 
     /**
      * Gets the value of the trigger property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the trigger property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getTrigger().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Trigger }
-     * 
-     * 
      */
     public List<Trigger> getTrigger() {
         if (trigger == null) {
@@ -312,11 +275,9 @@ public class Transition {
 
     /**
      * Gets the value of the transactionRef property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TransactionRef }
-     *     
+     *
+     * @return possible object is
+     * {@link TransactionRef }
      */
     public TransactionRef getTransactionRef() {
         return transactionRef;
@@ -324,11 +285,9 @@ public class Transition {
 
     /**
      * Sets the value of the transactionRef property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TransactionRef }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link TransactionRef }
      */
     public void setTransactionRef(TransactionRef value) {
         this.transactionRef = value;
@@ -336,25 +295,23 @@ public class Transition {
 
     /**
      * Gets the value of the roleRef property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the roleRef property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getRoleRef().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link RoleRef }
-     * 
-     * 
      */
     public List<RoleRef> getRoleRef() {
         if (roleRef == null) {
@@ -365,25 +322,23 @@ public class Transition {
 
     /**
      * Gets the value of the dataRef property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the dataRef property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getDataRef().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link DataRef }
-     * 
-     * 
      */
     public List<DataRef> getDataRef() {
         if (dataRef == null) {
@@ -394,25 +349,23 @@ public class Transition {
 
     /**
      * Gets the value of the dataGroup property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the dataGroup property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getDataGroup().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link DataGroup }
-     * 
-     * 
      */
     public List<DataGroup> getDataGroup() {
         if (dataGroup == null) {
@@ -423,25 +376,23 @@ public class Transition {
 
     /**
      * Gets the value of the event property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the event property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getEvent().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Event }
-     * 
-     * 
      */
     public List<Event> getEvent() {
         if (event == null) {

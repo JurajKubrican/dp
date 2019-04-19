@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.*;
@@ -6,9 +5,9 @@ import javax.xml.bind.annotation.*;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -24,14 +23,12 @@ import javax.xml.bind.annotation.*;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "id",
-    "title",
-    "name"
+        "id",
+        "title",
+        "name"
 })
 @XmlRootElement(name = "role")
 public class Role {
@@ -43,11 +40,9 @@ public class Role {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getId() {
         return id;
@@ -55,11 +50,9 @@ public class Role {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -67,11 +60,9 @@ public class Role {
 
     /**
      * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @return possible object is
+     * {@link I18NStringType }
      */
     public I18NStringType getTitle() {
         return title;
@@ -79,11 +70,9 @@ public class Role {
 
     /**
      * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link I18NStringType }
      */
     public void setTitle(I18NStringType value) {
         this.title = value;
@@ -91,11 +80,9 @@ public class Role {
 
     /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @return possible object is
+     * {@link I18NStringType }
      */
     public I18NStringType getName() {
         return name;
@@ -103,11 +90,9 @@ public class Role {
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link I18NStringType }
      */
     public void setName(I18NStringType value) {
         this.name = value;

@@ -1,21 +1,22 @@
 package sk.knet.dp.generator
 
 import com.squareup.kotlinpoet.*
-import io.swagger.annotations.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import io.swagger.annotations.ApiOperation
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.api.ResetCommand
-import org.springframework.web.bind.annotation.*
-import java.io.File
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import sk.knet.dp.petriflow.Behavior
 import sk.knet.dp.petriflow.DataType
-import java.io.InputStreamReader
 import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -38,8 +39,6 @@ data class Endpoint(
 
 @Service
 class Generator {
-
-    private val endpointProcesses: MutableList<Process> = mutableListOf()
 
     @Autowired
     lateinit var fileStorage: FileStorage
@@ -68,9 +67,6 @@ class Generator {
             val classFile = generateClass(transitions, clientName)
             writeClass(classFile, clientName)
         }
-
-
-
 
 
 
@@ -141,7 +137,7 @@ class Generator {
                         when (prop.type) {
                             DataType.BOOLEAN -> regex = """0|1|true|false"""
                             DataType.TEXT -> regex = """.*"""
-                            DataType.DATE -> regex = """(\\d{4})-(\\d{2})-(\\d{2}))"""
+                            DataType.DATE -> regex = """(\\d{4})-(\\d{2})-(\\d{2})"""
                             DataType.DATE_TIME -> regex = """(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2})\\:(\\d{2})\\:(\\d{2})[+-](\\d{2})\\:(\\d{2})"""
                             DataType.NUMBER -> regex = """\\d+"""
                             DataType.ENUMERATION -> regex = prop.enumValues!!.joinToString("|")
@@ -159,7 +155,7 @@ class Generator {
                                 ""
                             }} !Regex("$regex").matches(${prop.name}) ) {
                                 errors.add("${prop.name}" +
-                                "should match $regex" )}""")
+                                " should match $regex" )}""")
                         }
                     }
 
@@ -167,9 +163,20 @@ class Generator {
 
 
                         statements.add(""" if(errors.isNotEmpty()){
-                        |  return(errors.toString())
+                        |  return ResponseEntity(errors.toString(), BAD_REQUEST)
                         |} """.trimMargin())
 
+                    statements.add("""
+                         processServerRequest.post("$className",
+                         "${endpoint.id}",
+                         mapOf(${endpoint.props.joinToString(",") {
+                        """ "${it.name}" to ${it.name} """
+                    }})
+                        )
+
+
+                        return ResponseEntity("", OK)
+                    """.trimIndent())
 
                     // Annotations
                     val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
@@ -183,6 +190,10 @@ class Generator {
                     descriptionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
 
 
+                    val t = ClassName("org.springframework.http", "ResponseEntity")
+                            .parameterizedBy(ClassName("kotlin", "String"))
+
+
                     //Function itself
                     val fs = FunSpec.builder("post${endpoint.id}")
                             .addAnnotation(AnnotationSpec.builder(PostMapping::class)
@@ -190,11 +201,10 @@ class Generator {
                                     .build())
                             .addAnnotation(rolesAnnotation.build())
                             .addAnnotation(descriptionAnnotation.build())
-                            .returns(String::class)
+                            .returns(t)
                     statements.map { stmt ->
                         fs.addStatement(stmt)
                     }
-                    fs.addStatement("""return "" """)
 
 
                     endpoint.props
@@ -306,12 +316,20 @@ class Generator {
         val newClass = TypeSpec.classBuilder(className)
                 .addFunctions(postFunctions.union(endpointsGET.first))
                 .addTypes(endpointsGET.second)
+                .addProperty(PropertySpec
+                        .builder("processServerRequest",
+                                ClassName("sk.knet.dp.endpointshell", "ProcessServerRequest"),
+                                KModifier.LATEINIT)
+                        .mutable()
+                        .addAnnotation(Autowired::class).build())
                 .addAnnotation(RestController::class)
                 .addAnnotation(EnableResourceServer::class)
                 .build()
 
+
         val fileSpec = FileSpec
                 .builder("sk.knet.dp.endpointshell", className)
+                .addImport(HttpStatus::class, "BAD_REQUEST", "OK")
                 .addType(newClass)
 
         return fileSpec.build().toString()

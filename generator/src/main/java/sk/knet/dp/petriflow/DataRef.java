@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.*;
@@ -6,9 +5,9 @@ import javax.xml.bind.annotation.*;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -21,13 +20,11 @@ import javax.xml.bind.annotation.*;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "id",
-    "logic"
+        "id",
+        "logic"
 })
 @XmlRootElement(name = "dataRef")
 public class DataRef {
@@ -39,11 +36,9 @@ public class DataRef {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getId() {
         return id;
@@ -51,11 +46,9 @@ public class DataRef {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -63,11 +56,9 @@ public class DataRef {
 
     /**
      * Gets the value of the logic property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Logic }
-     *     
+     *
+     * @return possible object is
+     * {@link Logic }
      */
     public Logic getLogic() {
         return logic;
@@ -75,11 +66,9 @@ public class DataRef {
 
     /**
      * Sets the value of the logic property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Logic }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Logic }
      */
     public void setLogic(Logic value) {
         this.logic = value;

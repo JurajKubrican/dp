@@ -1,4 +1,3 @@
-
 package sk.knet.dp.petriflow;
 
 import javax.xml.bind.annotation.*;
@@ -8,9 +7,9 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -35,23 +34,21 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "id",
-    "title",
-    "placeholder",
-    "desc",
-    "values",
-    "valid",
-    "init",
-    "encryption",
-    "action",
-    "actionRef",
-    "documentRef",
-    "remote"
+        "id",
+        "title",
+        "placeholder",
+        "desc",
+        "values",
+        "valid",
+        "init",
+        "encryption",
+        "action",
+        "actionRef",
+        "documentRef",
+        "remote"
 })
 @XmlRootElement(name = "data")
 public class Data {
@@ -77,11 +74,9 @@ public class Data {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getId() {
         return id;
@@ -89,11 +84,9 @@ public class Data {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -101,11 +94,9 @@ public class Data {
 
     /**
      * Gets the value of the title property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @return possible object is
+     * {@link I18NStringType }
      */
     public I18NStringType getTitle() {
         return title;
@@ -113,11 +104,9 @@ public class Data {
 
     /**
      * Sets the value of the title property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link I18NStringType }
      */
     public void setTitle(I18NStringType value) {
         this.title = value;
@@ -125,11 +114,9 @@ public class Data {
 
     /**
      * Gets the value of the placeholder property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @return possible object is
+     * {@link I18NStringType }
      */
     public I18NStringType getPlaceholder() {
         return placeholder;
@@ -137,11 +124,9 @@ public class Data {
 
     /**
      * Sets the value of the placeholder property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link I18NStringType }
      */
     public void setPlaceholder(I18NStringType value) {
         this.placeholder = value;
@@ -149,11 +134,9 @@ public class Data {
 
     /**
      * Gets the value of the desc property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @return possible object is
+     * {@link I18NStringType }
      */
     public I18NStringType getDesc() {
         return desc;
@@ -161,11 +144,9 @@ public class Data {
 
     /**
      * Sets the value of the desc property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link I18NStringType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link I18NStringType }
      */
     public void setDesc(I18NStringType value) {
         this.desc = value;
@@ -173,25 +154,23 @@ public class Data {
 
     /**
      * Gets the value of the values property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the values property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getValues().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link I18NStringType }
-     * 
-     * 
      */
     public List<I18NStringType> getValues() {
         if (values == null) {
@@ -202,25 +181,23 @@ public class Data {
 
     /**
      * Gets the value of the valid property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the valid property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getValid().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link String }
-     * 
-     * 
      */
     public List<String> getValid() {
         if (valid == null) {
@@ -231,11 +208,9 @@ public class Data {
 
     /**
      * Gets the value of the init property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getInit() {
         return init;
@@ -243,11 +218,9 @@ public class Data {
 
     /**
      * Sets the value of the init property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setInit(String value) {
         this.init = value;
@@ -255,11 +228,9 @@ public class Data {
 
     /**
      * Gets the value of the encryption property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link EncryptionType }
-     *     
+     *
+     * @return possible object is
+     * {@link EncryptionType }
      */
     public EncryptionType getEncryption() {
         return encryption;
@@ -267,11 +238,9 @@ public class Data {
 
     /**
      * Sets the value of the encryption property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link EncryptionType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link EncryptionType }
      */
     public void setEncryption(EncryptionType value) {
         this.encryption = value;
@@ -279,25 +248,23 @@ public class Data {
 
     /**
      * Gets the value of the action property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the action property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getAction().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ActionType }
-     * 
-     * 
      */
     public List<ActionType> getAction() {
         if (action == null) {
@@ -308,25 +275,23 @@ public class Data {
 
     /**
      * Gets the value of the actionRef property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the actionRef property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getActionRef().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ActionRefType }
-     * 
-     * 
      */
     public List<ActionRefType> getActionRef() {
         if (actionRef == null) {
@@ -337,11 +302,9 @@ public class Data {
 
     /**
      * Gets the value of the documentRef property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DocumentRef }
-     *     
+     *
+     * @return possible object is
+     * {@link DocumentRef }
      */
     public DocumentRef getDocumentRef() {
         return documentRef;
@@ -349,11 +312,9 @@ public class Data {
 
     /**
      * Sets the value of the documentRef property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DocumentRef }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link DocumentRef }
      */
     public void setDocumentRef(DocumentRef value) {
         this.documentRef = value;
@@ -361,11 +322,9 @@ public class Data {
 
     /**
      * Gets the value of the remote property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getRemote() {
         return remote;
@@ -373,11 +332,9 @@ public class Data {
 
     /**
      * Sets the value of the remote property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setRemote(String value) {
         this.remote = value;
@@ -385,11 +342,9 @@ public class Data {
 
     /**
      * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link DataType }
-     *     
+     *
+     * @return possible object is
+     * {@link DataType }
      */
     public DataType getType() {
         return type;
@@ -397,11 +352,9 @@ public class Data {
 
     /**
      * Sets the value of the type property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link DataType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link DataType }
      */
     public void setType(DataType value) {
         this.type = value;
@@ -409,11 +362,9 @@ public class Data {
 
     /**
      * Gets the value of the immediate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
+     *
+     * @return possible object is
+     * {@link Boolean }
      */
     public Boolean isImmediate() {
         return immediate;
@@ -421,11 +372,9 @@ public class Data {
 
     /**
      * Sets the value of the immediate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Boolean }
      */
     public void setImmediate(Boolean value) {
         this.immediate = value;

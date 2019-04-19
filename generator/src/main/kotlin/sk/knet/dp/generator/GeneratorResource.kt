@@ -23,8 +23,6 @@ class GeneratorResource {
             @RequestParam(value = "users") usersFile: MultipartFile,
             @RequestParam(value = "clientname") clientName: String): String {
 
-        print("1")
-
         fileStorage.store(usersFile, "Users$clientName")
         fileStorage.store(modelFile, "Client$clientName")
         generator.generateClients()

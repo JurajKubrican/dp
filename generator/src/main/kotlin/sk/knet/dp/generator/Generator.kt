@@ -344,12 +344,6 @@ class Generator {
         File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/$clientName.kt")
                 .writeText(classString)
 
-        endpointProcesses.map {
-            println("Killing process: $it")
-            it.destroyForcibly()
-        }
-        endpointProcesses.removeAll { true }
-
 
         File("./endpoint-shell/gradlew").setExecutable(true)
         for (i in 2..2) {
@@ -360,12 +354,13 @@ class Generator {
             print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
             print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
 
+            Runtime.getRuntime().exec("fuser -k 808$i/tcp")
+
             ps = Runtime.getRuntime()
                     .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File("./endpoint-shell"))
             print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
             print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
             ps.waitFor(10, TimeUnit.SECONDS)
-            endpointProcesses.add(ps)
 
         }
 

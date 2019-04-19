@@ -324,9 +324,7 @@ class Generator {
         try {
             val repo = Git(FileRepository("./endpoint-shell/.git"))
             repo.stashCreate().call()
-            repo.reset()
-                    .setMode(ResetCommand.ResetType.HARD)
-                    .setRef("origin/master").call()
+            repo.pull().call()
             repo.stashApply().call()
 
 

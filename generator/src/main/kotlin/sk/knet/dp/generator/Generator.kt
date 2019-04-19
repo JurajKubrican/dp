@@ -338,12 +338,7 @@ class Generator {
 
 
         try {
-            val repo = Git(FileRepository("./endpoint-shell/.git"))
-            repo.stashCreate().call()
-            repo.pull().call()
-            repo.stashApply().call()
-
-
+            Git(FileRepository("./endpoint-shell/.git")).pull().call()
         } catch (ex: GitAPIException) {
             File("./endpoint-shell").deleteRecursively()
             Git.cloneRepository()

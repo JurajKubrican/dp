@@ -21,6 +21,7 @@ import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
+import javax.annotation.PostConstruct
 import javax.annotation.security.RolesAllowed
 
 
@@ -44,6 +45,8 @@ class Generator {
     lateinit var fileStorage: FileStorage
 
 
+
+    @PostConstruct
     fun generateClients(): String {
 
         val files = fileStorage.listDir() ?: return "no clients"

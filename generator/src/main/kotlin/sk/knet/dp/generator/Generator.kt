@@ -45,7 +45,6 @@ class Generator {
     lateinit var fileStorage: FileStorage
 
 
-
     @PostConstruct
     fun generateClients(): String {
 
@@ -67,11 +66,11 @@ class Generator {
             val clientName = it.fileName.toString().substring(6)
             val n = NetReader(it.toString())
             val transitions = n.facadeTransitions
-            val classFile = generateClass(transitions, clientName)
-            writeClass(classFile, clientName)
+            generateClass(transitions, clientName)
+
         }
 
-
+        runEndpoint()
 
         return "done"
 
@@ -86,7 +85,7 @@ class Generator {
                         "${clientName.toUpperCase()}_${itt.id.toUpperCase()}"
                     }.toString(),
                     StandardCharsets.UTF_8.toString())
-            print(URL("http://localhost:8088/addUser?username=${clientName}_${it.name}&password=${it.password}&roles=$roles").readText())
+            URL("http://localhost:8088/addUser?username=${clientName}_${it.name}&password=${it.password}&roles=$roles").readText()
         }
 
     }
@@ -170,16 +169,11 @@ class Generator {
                         |} """.trimMargin())
 
                     statements.add("""
-                         processServerRequest.post("$className",
-                         "${endpoint.id}",
-                         mapOf(${endpoint.props.joinToString(",") {
-                        """ "${it.name}" to ${it.name} """
-                    }})
-                        )
-
-
-                        return ResponseEntity("", OK)
-                    """.trimIndent())
+                    |     processServerRequest.post("$className",
+                    |     "${endpoint.id}",
+                    |    mapOf(${endpoint.props.joinToString(",") { """ "${it.name}" to ${it.name} """ }}))
+                    |    return ResponseEntity("", OK)
+                    """.trimMargin())
 
                     // Annotations
                     val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
@@ -309,7 +303,7 @@ class Generator {
     private fun generateClass(
             transitions: List<FacadeTransition>,
             className: String
-    ): String {
+    ) {
         val endpointsGET = generateGetEndpoints(transitions, className)
 
 
@@ -335,7 +329,8 @@ class Generator {
                 .addImport(HttpStatus::class, "BAD_REQUEST", "OK")
                 .addType(newClass)
 
-        return fileSpec.build().toString()
+        File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/$className.kt")
+                .writeText(fileSpec.build().toString())
     }
 
 
@@ -359,9 +354,7 @@ class Generator {
     }
 
 
-    private fun writeClass(classString: String, clientName: String) {
-        File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/$clientName.kt")
-                .writeText(classString)
+    private fun runEndpoint() {
 
 
         File("./endpoint-shell/gradlew").setExecutable(true)

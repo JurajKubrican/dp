@@ -9,6 +9,10 @@ spring:
     name: gateway-service
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: register_route
           uri: "http://localhost:8081/register"
@@ -22,14 +26,9 @@ spring:
           uri: "http://localhost:8088/user"
           predicates:
             - "Path=/user"
-        - id: service_route
-          uri: "http://localhost:8082/"
+        - id: endoint_route
+          uri: "lb://ENDPOINT-SERVICE/"
           predicates:
             - "Path=/**"
 
-ribbon:
-  eureka:
-    enabled: false
-#load-balanced-service:
-#  ribbon:
-#    listOfServers: http://localhost:8082, http://localhost:8083, http://localhost:8084
+

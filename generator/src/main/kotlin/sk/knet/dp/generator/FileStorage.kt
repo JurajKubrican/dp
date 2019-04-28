@@ -8,10 +8,12 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import kotlin.streams.toList
 
+const val FILE_STORAGE_DIR = "./tmp/file_storage"
+
 @Service
 class FileStorage {
 
-    val rootLocation: Path = Paths.get("filestorage")
+    val rootLocation: Path = Paths.get(FILE_STORAGE_DIR)
 
     fun store(file: MultipartFile, fileName: String) {
 

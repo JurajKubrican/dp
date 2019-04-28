@@ -38,6 +38,10 @@ data class Endpoint(
         var roles: List<String>,
         val label: String)
 
+
+const val RELAY_BUILD_DIR = "./tmp/relay_build"
+
+
 @Service
 class Generator {
 
@@ -46,27 +50,27 @@ class Generator {
 
 
     @PostConstruct
-    fun generateClients(): String {
+    fun generateNets(): String {
 
-        val files = fileStorage.listDir() ?: return "no clients"
+        val files = fileStorage.listDir() ?: return "no Nets"
         prepareShell()
 
         files.filter {
             Regex("^Users.*").matches(it.fileName.toString())
         }.forEach {
             val users = UsersReader(it.toString())
-            registerUsers(users.document.user, it.fileName.toString().substring(5))
+            registerUsers(users.document.user, it.fileName.toString().substring(4))
         }
 
 
 
         files.filter {
-            Regex("^Client.*").matches(it.fileName.toString())
+            Regex("^Net.*").matches(it.fileName.toString())
         }.forEach {
-            val clientName = it.fileName.toString().substring(6)
+            val netId = it.fileName.toString().substring(3)
             val n = NetReader(it.toString())
             val transitions = n.facadeTransitions
-            generateClass(transitions, clientName)
+            generateClass(transitions, netId)
 
         }
 
@@ -77,15 +81,15 @@ class Generator {
     }
 
 
-    fun registerUsers(users: List<sk.knet.dp.userschema.User>, clientName: String) {
+    fun registerUsers(users: List<sk.knet.dp.userschema.User>, netId: String) {
 
         users.forEach {
             val roles = URLEncoder.encode(
                     it.role.map { itt ->
-                        "${clientName.toUpperCase()}_${itt.id.toUpperCase()}"
+                        "${netId.toUpperCase()}_${itt.id.toUpperCase()}"
                     }.toString(),
                     StandardCharsets.UTF_8.toString())
-            URL("http://localhost:8088/addUser?username=${clientName}_${it.name}&password=${it.password}&roles=$roles").readText()
+            URL("http://localhost:8088/addUser?username=${netId}_${it.name}&password=${it.password}&roles=$roles").readText()
         }
 
     }
@@ -315,7 +319,7 @@ class Generator {
                 .addTypes(endpointsGET.second)
                 .addProperty(PropertySpec
                         .builder("processServerRequest",
-                                ClassName("sk.knet.dp.endpointshell", "ProcessServerRequest"),
+                                ClassName("sk.knet.dp.relay", "ProcessServerRequest"),
                                 KModifier.LATEINIT)
                         .mutable()
                         .addAnnotation(Autowired::class).build())
@@ -325,11 +329,11 @@ class Generator {
 
 
         val fileSpec = FileSpec
-                .builder("sk.knet.dp.endpointshell", className)
+                .builder("sk.knet.dp.relay", className)
                 .addImport(HttpStatus::class, "BAD_REQUEST", "OK")
                 .addType(newClass)
 
-        File("./endpoint-shell/src/main/kotlin/sk/knet/dp/endpointshell/$className.kt")
+        File("$RELAY_BUILD_DIR/src/main/kotlin/sk/knet/dp/relay/$className.kt")
                 .writeText(fileSpec.build().toString())
     }
 
@@ -338,12 +342,12 @@ class Generator {
 
 
         try {
-            Git(FileRepository("./endpoint-shell/.git")).pull().call()
+            Git(FileRepository("$RELAY_BUILD_DIR/.git")).pull().call()
         } catch (ex: GitAPIException) {
-            File("./endpoint-shell").deleteRecursively()
+            File(RELAY_BUILD_DIR).deleteRecursively()
             Git.cloneRepository()
-                    .setURI("https://github.com/TheYurry/dp_endpoint.git")
-                    .setDirectory(File("./endpoint-shell"))
+                    .setURI("https://github.com/TheYurry/dp_relay.git")
+                    .setDirectory(File(RELAY_BUILD_DIR))
                     .setBranch("master").call()
         }
     }
@@ -352,22 +356,23 @@ class Generator {
     private fun runEndpoint() {
 
 
-        File("./endpoint-shell/gradlew").setExecutable(true)
+        File("$RELAY_BUILD_DIR/gradlew").setExecutable(true)
         for (i in 2..2) {
             println("building: $i")
             var ps = Runtime.getRuntime()
-                    .exec("./gradlew build", null, File("./endpoint-shell"))
+                    .exec("./gradlew build", null, File(RELAY_BUILD_DIR))
             ps.waitFor()
             print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
             print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
 
             Runtime.getRuntime().exec("fuser -k 808$i/tcp")
-
+            println("\nrunning: $i")
             ps = Runtime.getRuntime()
-                    .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File("./endpoint-shell"))
+                    .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File(RELAY_BUILD_DIR))
             print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
             print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
             ps.waitFor(10, TimeUnit.SECONDS)
+            println("\ndone: $i")
 
         }
 

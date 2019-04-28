@@ -15,9 +15,9 @@ spring:
           lower-case-service-id: true
       routes:
         - id: register_route
-          uri: "http://localhost:8081/register"
+          uri: "http://localhost:8081/"
           predicates:
-            - "Path=/register"
+            - "Path=/"
         - id: auth_route
           uri: "http://localhost:8088/oauth/token"
           predicates:
@@ -27,7 +27,7 @@ spring:
           predicates:
             - "Path=/user"
         - id: endoint_route
-          uri: "lb://ENDPOINT-SERVICE/"
+          uri: "lb://RELAY-SERVICE/"
           predicates:
             - "Path=/**"
 

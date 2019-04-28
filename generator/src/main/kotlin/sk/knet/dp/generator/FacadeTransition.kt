@@ -9,6 +9,8 @@ class FacadeTransition(t: Transition, dataIn: List<Data>) : Transition() {
 
     var rolesView: Set<String> = emptySet()
     var rolesPerform: Set<String> = emptySet()
+    var rolesDelegate: Set<String> = emptySet()
+
     var data: List<FacadeData> = emptyList()
 
     init {
@@ -28,6 +30,14 @@ class FacadeTransition(t: Transition, dataIn: List<Data>) : Transition() {
                 .filter { it.logic.isPerform!! }
                 .map(RoleRef::getId)
                 .toSet()
+
+        rolesDelegate = t.roleRef
+                .filter { it.logic.isDelegate!! }
+                .map(RoleRef::getId)
+                .toSet()
+
+
+
 
 
         data = t.dataGroup

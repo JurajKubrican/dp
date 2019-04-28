@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.ResetCommand
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,8 +22,9 @@ import java.io.InputStreamReader
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import javax.annotation.PostConstruct
+import java.util.concurrent.TimeUnit
 import javax.annotation.security.RolesAllowed
+import kotlin.reflect.KClass
 
 
 data class Prop(
@@ -49,7 +51,7 @@ class Generator {
     lateinit var fileStorage: FileStorage
 
 
-    @PostConstruct
+    //    @PostConstruct
     fun generateNets(): String {
 
         val files = fileStorage.listDir() ?: return "no Nets"
@@ -95,9 +97,47 @@ class Generator {
     }
 
 
-    private fun generatePostFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+    private fun generateEmptyFunction(endpoint: Endpoint, operation: String, className: String, type: KClass<out Annotation> = PostMapping::class): FunSpec.Builder {
+        // Annotations
+        val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
+        endpoint.roles
+                .forEach {
+                    rolesAnnotation.addMember("\"$it\"")
+                }
+
+        val descriptionAnnotation = AnnotationSpec.builder(ApiOperation::class)
+        descriptionAnnotation.addMember("value = \"${endpoint.label}\"")
+        descriptionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
+
+
+        val t = ClassName("org.springframework.http", "ResponseEntity")
+                .parameterizedBy(ClassName("kotlin", "String"))
+
+
+        //Function itself
+        val fs = FunSpec.builder("$operation${endpoint.id}")
+                .addAnnotation(AnnotationSpec.builder(type)
+                        .addMember("\"$className/${endpoint.id}/{instanceId}/$operation\"")
+                        .build())
+                .addAnnotation(rolesAnnotation.build())
+                .addAnnotation(descriptionAnnotation.build())
+                .returns(t)
+
+
+        fs.addParameter(ParameterSpec
+                .builder("instanceId", String::class)
+                .addAnnotation(AnnotationSpec
+                        .builder(PathVariable::class)
+                        .addMember("\"instanceId\"")
+                        .build()).build())
+
+        return fs
+    }
+
+
+    private fun generateFinishFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
 //        Prep data
-        val endpointPOST = transitions
+        val endpoints = transitions
                 .map { transition ->
                     val props = transition.data
                             .filter { prop ->
@@ -106,23 +146,15 @@ class Generator {
                             .map { prop ->
                                 val required = prop.logic.behavior.contains(Behavior.EDITABLE) && prop.logic.behavior.contains(Behavior.REQUIRED)
 
-                                Prop(prop.id,
-                                        required,
-                                        prop.type,
-                                        prop.values)
+                                Prop(prop.id, required, prop.type, prop.values)
                             }
-
 
                     val roles = transition.rolesPerform
                             .map { role ->
                                 "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
                             }.toList()
 
-                    Endpoint(transition.id,
-                            RequestMethod.POST,
-                            props,
-                            roles,
-                            transition.label.value)
+                    Endpoint(transition.id, RequestMethod.POST, props, roles, transition.label.value)
                 }
                 .filter {
                     it.props.isNotEmpty()
@@ -131,7 +163,7 @@ class Generator {
 
 
 
-        return endpointPOST
+        return endpoints
                 .map { endpoint ->
 
                     val statements = mutableListOf(
@@ -173,40 +205,18 @@ class Generator {
                         |} """.trimMargin())
 
                     statements.add("""
-                    |     processServerRequest.post("$className",
+                    |     processServerRequest.perform("$className",
                     |     "${endpoint.id}",
+                    |     instanceId,
                     |    mapOf(${endpoint.props.joinToString(",") { """ "${it.name}" to ${it.name} """ }}))
                     |    return ResponseEntity("", OK)
                     """.trimMargin())
 
-                    // Annotations
-                    val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
-                    endpoint.roles
-                            .forEach {
-                                rolesAnnotation.addMember("\"$it\"")
-                            }
 
-                    val descriptionAnnotation = AnnotationSpec.builder(ApiOperation::class)
-                    descriptionAnnotation.addMember("value = \"${endpoint.label}\"")
-                    descriptionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
-
-
-                    val t = ClassName("org.springframework.http", "ResponseEntity")
-                            .parameterizedBy(ClassName("kotlin", "String"))
-
-
-                    //Function itself
-                    val fs = FunSpec.builder("post${endpoint.id}")
-                            .addAnnotation(AnnotationSpec.builder(PostMapping::class)
-                                    .addMember("\"$className/${endpoint.id}\"")
-                                    .build())
-                            .addAnnotation(rolesAnnotation.build())
-                            .addAnnotation(descriptionAnnotation.build())
-                            .returns(t)
+                    val fs = generateEmptyFunction(endpoint, "finish", className)
                     statements.map { stmt ->
                         fs.addStatement(stmt)
                     }
-
 
                     endpoint.props
                             .forEach { param ->
@@ -215,13 +225,13 @@ class Generator {
                                 if (!param.required) {
                                     ann.addMember("defaultValue = \"\"")
                                 }
-                                val ann2 = AnnotationSpec
-                                .builder(ApiParam::class)
-                                    .addMember("required = ${param.required}")
 
+                                val apiAnn = AnnotationSpec
+                                        .builder(ApiParam::class)
+                                        .addMember("required = ${param.required}")
 
-                                if(param.type == DataType.ENUMERATION || param.type==DataType.MULTICHOICE){
-                                   ann2.addMember("allowableValues = \"\"\"${param.enumValues}\"\"\"")
+                                if (param.type == DataType.ENUMERATION || param.type == DataType.MULTICHOICE) {
+                                    apiAnn.addMember("allowableValues = \"\"\"${param.enumValues}\"\"\"")
                                 }
 
 
@@ -233,7 +243,7 @@ class Generator {
 
                                                 }
                                         ).addAnnotation(ann.build())
-                                        .addAnnotation(ann2.build())
+                                        .addAnnotation(apiAnn.build())
 
 
 
@@ -250,7 +260,8 @@ class Generator {
                 .map { transition ->
                     val props = transition.data
                             .filter { prop ->
-                                prop.logic.behavior.contains(Behavior.VISIBLE)
+                                prop.logic.behavior
+                                        .contains(Behavior.VISIBLE)
                             }
                             .map { prop ->
                                 Prop(prop.id, false)
@@ -261,12 +272,7 @@ class Generator {
                                 "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
                             }.toList()
 
-
-                    Endpoint(transition.id,
-                            RequestMethod.POST,
-                            props,
-                            roles,
-                            transition.label.value)
+                    Endpoint(transition.id, RequestMethod.POST, props, roles, transition.label.value)
                 }
                 .filter { transition ->
                     transition.props.isNotEmpty()
@@ -288,23 +294,13 @@ class Generator {
                             .build())
                     .build()
 
-            // Annotations
-            val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
-            endpoint.roles.forEach { role ->
-                rolesAnnotation.addMember("\"$role\"")
-            }
-
-            val descriptionAnnotation = AnnotationSpec.builder(ApiOperation::class)
-            descriptionAnnotation.addMember("value = \"${endpoint.label}\"")
-            descriptionAnnotation.addMember("notes = \"Allowed roles: ${endpoint.roles}\"")
-
-
-            val fs = FunSpec.builder("get${endpoint.id}")
-                    .addAnnotation(AnnotationSpec.builder(GetMapping::class)
-                            .addMember("\"$className/${endpoint.id}\"")
-                            .build())
-                    .addAnnotation(rolesAnnotation.build())
-                    .addAnnotation(descriptionAnnotation.build())
+            val fs = generateEmptyFunction(endpoint, "view", className, GetMapping::class)
+                    .returns(ClassName("sk.knet.dp.relay.$className", returnObjectName))
+                    .addStatement("""
+                    |     processServerRequest.get("$className",
+                    |     "${endpoint.id}",
+                    |     instanceId)
+                    """.trimMargin())
                     .addStatement("return $returnObjectName()")
 
 
@@ -315,19 +311,145 @@ class Generator {
         return Pair(result.map { it.first }, result.map { it.second })
     }
 
+    private fun generateAssignFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+//        Prep data
+        val endpoints = transitions
+                .map { transition ->
+                    val roles = transition.rolesPerform
+                            .map { role ->
+                                "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
+                            }.toList()
+
+                    Endpoint(transition.id, RequestMethod.POST, emptyList(), roles, transition.label.value)
+                }
+
+        return endpoints
+                .map { endpoint ->
+
+                    val statements = mutableListOf(
+                            """processServerRequest.assign("$className",
+                    |     "${endpoint.id}",
+                    |     instanceId)
+                    |    return ResponseEntity("", OK)""".trimMargin()
+                    )
+
+                    val fs = generateEmptyFunction(endpoint, "assign", className)
+
+                    statements.map { stmt ->
+                        fs.addStatement(stmt)
+                    }
+                    fs.build()
+                }
+    }
+
+    private fun generateDelegateFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+//        Prep data
+        val endpoints = transitions
+                .map { transition ->
+                    val roles = transition.rolesDelegate
+                            .map { role ->
+                                "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
+                            }.toList()
+
+                    Endpoint(transition.id, RequestMethod.POST, emptyList(), roles, transition.label.value)
+                }
+
+        return endpoints
+                .map { endpoint ->
+
+                    val statements = mutableListOf(
+                            """processServerRequest.delegate("$className",
+                    |     "${endpoint.id}",
+                    |     instanceId,
+                    |     userId)
+                    |     return ResponseEntity("", OK)""".trimMargin()
+                    )
+
+                    val fs = generateEmptyFunction(endpoint, "delegate", className)
+
+                    statements.map { stmt ->
+                        fs.addStatement(stmt)
+                    }
+
+                    fs.addParameter(ParameterSpec
+                            .builder("userId", String::class)
+                            .addAnnotation(AnnotationSpec
+                                    .builder(RequestParam::class)
+                                    .addMember("value = \"userId\"").build())
+                            .addAnnotation(AnnotationSpec
+                                    .builder(ApiParam::class)
+                                    .addMember("required = true").build())
+                            .build())
+
+                    fs.build()
+                }
+    }
+
+    private fun generateCancelFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+//        Prep data
+        val endpoints = transitions
+                .map { transition ->
+                    val roles = transition.rolesPerform
+                            .map { role ->
+                                "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
+                            }.toList()
+
+                    Endpoint(transition.id, RequestMethod.POST, emptyList(), roles, transition.label.value)
+                }
+
+        return endpoints
+                .map { endpoint ->
+
+                    val statements = mutableListOf(
+                            """processServerRequest.cancel("$className",
+                    |     "${endpoint.id}",
+                    |     instanceId)
+                    |     return ResponseEntity("", OK)""".trimMargin()
+                    )
+
+                    val fs = generateEmptyFunction(endpoint, "cancel", className)
+
+                    statements.map { stmt ->
+                        fs.addStatement(stmt)
+                    }
+
+                    fs.addParameter(ParameterSpec
+                            .builder("userId", String::class)
+                            .addAnnotation(AnnotationSpec
+                                    .builder(RequestParam::class)
+                                    .addMember("value = \"userId\"").build())
+                            .addAnnotation(AnnotationSpec
+                                    .builder(ApiParam::class)
+                                    .addMember("required = true").build())
+                            .build())
+
+                    fs.build()
+                }
+    }
+
 
     private fun generateClass(
             transitions: List<FacadeTransition>,
             className: String
     ) {
+        println("generating class:$className")
         val endpointsGET = generateGetEndpoints(transitions, className)
 
 
-        val postFunctions = generatePostFunctions(transitions, className)
+        val finishFunctions = generateFinishFunctions(transitions, className)
+
+        val assignFunctions = generateAssignFunctions(transitions, className)
+        val delegateFunctions = generateDelegateFunctions(transitions, className)
+        val cancelFunctions = generateCancelFunctions(transitions, className)
 
 
         val newClass = TypeSpec.classBuilder(className)
-                .addFunctions(postFunctions.union(endpointsGET.first))
+                .addFunctions(finishFunctions
+                        .union(endpointsGET.first)
+                        .union(assignFunctions)
+                        .union(delegateFunctions)
+                        .union(cancelFunctions)
+                )
                 .addTypes(endpointsGET.second)
                 .addProperty(PropertySpec
                         .builder("processServerRequest",
@@ -352,10 +474,19 @@ class Generator {
 
     private fun prepareShell() {
 
-
+        println("resetting repo")
         try {
-            Git(FileRepository("$RELAY_BUILD_DIR/.git")).pull().call()
+            val repo = Git(FileRepository("$RELAY_BUILD_DIR/.git"))
+            repo.add()
+                    .addFilepattern(".")
+                    .call()
+            repo.reset()
+                    .setMode(ResetCommand.ResetType.HARD)
+                    .setRef("origin/master")
+                    .call()
         } catch (ex: GitAPIException) {
+            println(ex)
+            println("error resetting, pulling fresh repo")
             File(RELAY_BUILD_DIR).deleteRecursively()
             Git.cloneRepository()
                     .setURI("https://github.com/TheYurry/dp_relay.git")
@@ -374,8 +505,14 @@ class Generator {
             var ps = Runtime.getRuntime()
                     .exec("./gradlew build", null, File(RELAY_BUILD_DIR))
             ps.waitFor()
-            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
-            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+            val out = BufferedReader(InputStreamReader(ps.inputStream)).readLines()
+            if (out.reversed().any { Regex(".*BUILD SUCCESSFUL.*").matches(it) }) {
+                println("ok")
+            } else {
+                print(out)
+                print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+            }
+
 
             println("\nkilling: $i")
             ps = Runtime.getRuntime().exec("fuser -k 808$i/tcp")
@@ -386,9 +523,9 @@ class Generator {
             println("\nrunning: $i")
             ps = Runtime.getRuntime()
                     .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File(RELAY_BUILD_DIR))
-
-//            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
-//            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
+            ps.waitFor(10, TimeUnit.SECONDS)
+            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
 
             println("\ndone: $i")
 

@@ -8,10 +8,10 @@ fuser -k 8083/tcp
 fuser -k 8088/tcp
 
 
-./gradlew -b ./eureka/build.gradle  bootrun &
+./gradlew -b ./eureka/build.gradle --no-daemon bootrun &
 sleep 5
-./gradlew -b ./authorization/build.gradle  bootrun &
+./gradlew -b ./authorization/build.gradle --no-daemon bootrun &
 sleep 5
-./gradlew -b ./gateway/build.gradle  bootrun &
+./gradlew -b ./gateway/build.gradle --no-daemon  bootrun &
 sleep 5
-./gradlew -b ./generator/build.gradle  bootrun &
+./gradlew -b ./generator/build.gradle --no-daemon  bootrun &

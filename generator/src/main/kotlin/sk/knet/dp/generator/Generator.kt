@@ -386,9 +386,9 @@ class Generator {
             println("\nrunning: $i")
             ps = Runtime.getRuntime()
                     .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File(RELAY_BUILD_DIR))
-//            ps.waitFor(10, TimeUnit.SECONDS)
-            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
-            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
+
+//            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+//            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
 
             println("\ndone: $i")
 

@@ -3,6 +3,7 @@ package sk.knet.dp.generator
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.internal.storage.file.FileRepository
@@ -20,7 +21,6 @@ import java.io.InputStreamReader
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
 import javax.annotation.PostConstruct
 import javax.annotation.security.RolesAllowed
 
@@ -215,6 +215,16 @@ class Generator {
                                 if (!param.required) {
                                     ann.addMember("defaultValue = \"\"")
                                 }
+                                val ann2 = AnnotationSpec
+                                .builder(ApiParam::class)
+                                    .addMember("required = ${param.required}")
+
+
+                                if(param.type == DataType.ENUMERATION || param.type==DataType.MULTICHOICE){
+                                   ann2.addMember("allowableValues = \"\"\"${param.enumValues}\"\"\"")
+                                }
+
+
                                 val par = ParameterSpec
                                         .builder(param.name,
                                                 when (param.type) {
@@ -222,9 +232,11 @@ class Generator {
                                                     else -> String::class
 
                                                 }
-                                        )
+                                        ).addAnnotation(ann.build())
+                                        .addAnnotation(ann2.build())
 
-                                        .addAnnotation(ann.build())
+
+
                                 fs.addParameter(par.build())
 
                             }
@@ -365,13 +377,19 @@ class Generator {
             print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
             print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
 
-            Runtime.getRuntime().exec("fuser -k 808$i/tcp")
+            println("\nkilling: $i")
+            ps = Runtime.getRuntime().exec("fuser -k 808$i/tcp")
+            ps.waitFor()
+            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
+
             println("\nrunning: $i")
             ps = Runtime.getRuntime()
                     .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File(RELAY_BUILD_DIR))
+//            ps.waitFor(10, TimeUnit.SECONDS)
             print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
             print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
-            ps.waitFor(10, TimeUnit.SECONDS)
+
             println("\ndone: $i")
 
         }

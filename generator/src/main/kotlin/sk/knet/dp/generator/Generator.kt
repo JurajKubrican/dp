@@ -22,7 +22,7 @@ import java.io.InputStreamReader
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
+import javax.annotation.PostConstruct
 import javax.annotation.security.RolesAllowed
 import kotlin.reflect.KClass
 
@@ -51,7 +51,7 @@ class Generator {
     lateinit var fileStorage: FileStorage
 
 
-    //    @PostConstruct
+    @PostConstruct
     fun generateNets(): String {
 
         val files = fileStorage.listDir() ?: return "no Nets"
@@ -133,7 +133,6 @@ class Generator {
 
         return fs
     }
-
 
     private fun generateFinishFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
 //        Prep data
@@ -253,7 +252,6 @@ class Generator {
                     fs.build()
                 }
     }
-
 
     private fun generateGetEndpoints(transitions: List<FacadeTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
         val endpointGET = transitions
@@ -521,11 +519,12 @@ class Generator {
             print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
 
             println("\nrunning: $i")
-            ps = Runtime.getRuntime()
+            //ps =
+            Runtime.getRuntime()
                     .exec("./gradlew bootrun -Pargs=--spring.main.banner-mode=off,--server.port=808$i", null, File(RELAY_BUILD_DIR))
-            ps.waitFor(10, TimeUnit.SECONDS)
-            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
-            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
+//            ps.waitFor(10, TimeUnit.SECONDS)
+//            print(BufferedReader(InputStreamReader(ps.errorStream)).readLines())
+//            print(BufferedReader(InputStreamReader(ps.inputStream)).readLines())
 
             println("\ndone: $i")
 

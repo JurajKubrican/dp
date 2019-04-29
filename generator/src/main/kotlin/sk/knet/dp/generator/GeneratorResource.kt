@@ -35,7 +35,7 @@ class GeneratorResource {
     @ResponseBody
     @DeleteMapping("/")
     final fun deleteClient(
-            @ApiParam(name="netId", example = "netID123")
+            @ApiParam(name = "netId", example = "netID123")
             @RequestParam(value = "netId") netId: String): String {
 
         fileStorage.delete("Users$netId")

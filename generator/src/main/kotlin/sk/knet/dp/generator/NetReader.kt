@@ -1,5 +1,6 @@
 package sk.knet.dp.generator
 
+import org.eclipse.jgit.api.Git
 import sk.knet.dp.petriflow.Document
 import sk.knet.dp.petriflow.Role
 import java.io.File
@@ -29,5 +30,9 @@ class NetReader(f: String) {
 
         val jaxbUnmarshaller = jaxbContext.createUnmarshaller()
         return jaxbUnmarshaller.unmarshal(file) as Document
-    }
+
+
+
+
+        }
 }

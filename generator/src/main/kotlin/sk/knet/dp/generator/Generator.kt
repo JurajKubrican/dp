@@ -11,6 +11,7 @@ import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
+import org.springframework.stereotype.Controller
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -97,7 +98,7 @@ class Generator {
     }
 
 
-    private fun generateEmptyFunction(endpoint: Endpoint, operation: String, className: String, type: KClass<out Annotation> = PostMapping::class): FunSpec.Builder {
+    private fun generateEmptyFunction(endpoint: Endpoint, operation: String, type: KClass<out Annotation> = PostMapping::class): FunSpec.Builder {
         // Annotations
         val rolesAnnotation = AnnotationSpec.builder(RolesAllowed::class)
         endpoint.roles
@@ -117,7 +118,7 @@ class Generator {
         //Function itself
         val fs = FunSpec.builder("$operation${endpoint.id}")
                 .addAnnotation(AnnotationSpec.builder(type)
-                        .addMember("\"$className/${endpoint.id}/{instanceId}/$operation\"")
+                        .addMember("\"${endpoint.id}/{instanceId}/$operation\"")
                         .build())
                 .addAnnotation(rolesAnnotation.build())
                 .addAnnotation(descriptionAnnotation.build())
@@ -134,7 +135,7 @@ class Generator {
         return fs
     }
 
-    private fun generateFinishFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+    private fun generateDataFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
 //        Prep data
         val endpoints = transitions
                 .map { transition ->
@@ -184,15 +185,8 @@ class Generator {
                             }
                         }
                         if (regex != null) {
-
-                            statements.add(""" if (${
-                            if (!prop.required) {
-                                """${prop.name} !=  "" && """
-                            } else {
-                                ""
-                            }} !Regex("$regex").matches(${prop.name}) ) {
-                                errors.add("${prop.name}" +
-                                " should match $regex" )}""")
+                            statements.add(""" if (${if (!prop.required) """${prop.name} !=  "" && """ else ""}!Regex("$regex").matches(${prop.name}) ) {
+                                |   errors.add(""".trimMargin() + "\"\"\"${prop.name} should match $regex\"\"\" )}")
                         }
                     }
 
@@ -204,7 +198,7 @@ class Generator {
                         |} """.trimMargin())
 
                     statements.add("""
-                    |     processServerRequest.perform("$className",
+                    |     processServerRequest.data("$className",
                     |     "${endpoint.id}",
                     |     instanceId,
                     |    mapOf(${endpoint.props.joinToString(",") { """ "${it.name}" to ${it.name} """ }}))
@@ -212,7 +206,7 @@ class Generator {
                     """.trimMargin())
 
 
-                    val fs = generateEmptyFunction(endpoint, "finish", className)
+                    val fs = generateEmptyFunction(endpoint, "data")
                     statements.map { stmt ->
                         fs.addStatement(stmt)
                     }
@@ -253,14 +247,10 @@ class Generator {
                 }
     }
 
-    private fun generateGetEndpoints(transitions: List<FacadeTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
+    private fun generateViewEndpoints(transitions: List<FacadeTransition>, className: String): Pair<List<FunSpec>, List<TypeSpec>> {
         val endpointGET = transitions
                 .map { transition ->
                     val props = transition.data
-                            .filter { prop ->
-                                prop.logic.behavior
-                                        .contains(Behavior.VISIBLE)
-                            }
                             .map { prop ->
                                 Prop(prop.id, false)
                             }
@@ -292,7 +282,7 @@ class Generator {
                             .build())
                     .build()
 
-            val fs = generateEmptyFunction(endpoint, "view", className, GetMapping::class)
+            val fs = generateEmptyFunction(endpoint, "view", GetMapping::class)
                     .returns(ClassName("sk.knet.dp.relay.$className", returnObjectName))
                     .addStatement("""
                     |     processServerRequest.get("$className",
@@ -331,7 +321,7 @@ class Generator {
                     |    return ResponseEntity("", OK)""".trimMargin()
                     )
 
-                    val fs = generateEmptyFunction(endpoint, "assign", className)
+                    val fs = generateEmptyFunction(endpoint, "assign")
 
                     statements.map { stmt ->
                         fs.addStatement(stmt)
@@ -363,7 +353,7 @@ class Generator {
                     |     return ResponseEntity("", OK)""".trimMargin()
                     )
 
-                    val fs = generateEmptyFunction(endpoint, "delegate", className)
+                    val fs = generateEmptyFunction(endpoint, "delegate")
 
                     statements.map { stmt ->
                         fs.addStatement(stmt)
@@ -405,7 +395,7 @@ class Generator {
                     |     return ResponseEntity("", OK)""".trimMargin()
                     )
 
-                    val fs = generateEmptyFunction(endpoint, "cancel", className)
+                    val fs = generateEmptyFunction(endpoint, "cancel")
 
                     statements.map { stmt ->
                         fs.addStatement(stmt)
@@ -425,38 +415,81 @@ class Generator {
                 }
     }
 
+    private fun generateFinishFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+//        Prep data
+        val endpoints = transitions
+                .map { transition ->
+                    val roles = transition.rolesPerform
+                            .map { role ->
+                                "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
+                            }.toList()
+
+                    Endpoint(transition.id, RequestMethod.POST, emptyList(), roles, transition.label.value)
+                }
+
+        return endpoints
+                .map { endpoint ->
+
+                    val statements = mutableListOf(
+                            """processServerRequest.finish("$className",
+                    |     "${endpoint.id}",
+                    |     instanceId)
+                    |     return ResponseEntity("", OK)""".trimMargin()
+                    )
+
+                    val fs = generateEmptyFunction(endpoint, "finish")
+
+                    statements.map { stmt ->
+                        fs.addStatement(stmt)
+                    }
+
+                    fs.addParameter(ParameterSpec
+                            .builder("userId", String::class)
+                            .addAnnotation(AnnotationSpec
+                                    .builder(RequestParam::class)
+                                    .addMember("value = \"userId\"").build())
+                            .addAnnotation(AnnotationSpec
+                                    .builder(ApiParam::class)
+                                    .addMember("required = true").build())
+                            .build())
+
+                    fs.build()
+                }
+    }
 
     private fun generateClass(
             transitions: List<FacadeTransition>,
             className: String
     ) {
         println("generating class:$className")
-        val endpointsGET = generateGetEndpoints(transitions, className)
-
-
+        val viewEndpoints = generateViewEndpoints(transitions, className)
+        val dataFunctions = generateDataFunctions(transitions, className)
         val finishFunctions = generateFinishFunctions(transitions, className)
-
         val assignFunctions = generateAssignFunctions(transitions, className)
         val delegateFunctions = generateDelegateFunctions(transitions, className)
         val cancelFunctions = generateCancelFunctions(transitions, className)
 
 
         val newClass = TypeSpec.classBuilder(className)
-                .addFunctions(finishFunctions
-                        .union(endpointsGET.first)
+                .addFunctions(dataFunctions
+                        .union(finishFunctions)
+                        .union(viewEndpoints.first)
                         .union(assignFunctions)
                         .union(delegateFunctions)
                         .union(cancelFunctions)
                 )
-                .addTypes(endpointsGET.second)
+                .addTypes(viewEndpoints.second)
                 .addProperty(PropertySpec
                         .builder("processServerRequest",
                                 ClassName("sk.knet.dp.relay", "ProcessServerRequest"),
                                 KModifier.LATEINIT)
                         .mutable()
                         .addAnnotation(Autowired::class).build())
-                .addAnnotation(RestController::class)
+                .addAnnotation(Controller::class)
                 .addAnnotation(EnableResourceServer::class)
+                .addAnnotation(AnnotationSpec.builder(RequestMapping::class)
+                        .addMember("\"$className\"")
+                        .build())
                 .build()
 
 
@@ -475,13 +508,11 @@ class Generator {
         println("resetting repo")
         try {
             val repo = Git(FileRepository("$RELAY_BUILD_DIR/.git"))
-            repo.add()
-                    .addFilepattern(".")
-                    .call()
-            repo.reset()
-                    .setMode(ResetCommand.ResetType.HARD)
-                    .setRef("origin/master")
-                    .call()
+
+            repo.add().addFilepattern(".").call()
+            repo.reset().setMode(ResetCommand.ResetType.HARD).call()
+            repo.pull().call()
+
         } catch (ex: GitAPIException) {
             println(ex)
             println("error resetting, pulling fresh repo")

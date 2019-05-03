@@ -206,7 +206,7 @@ class Generator {
                     """.trimMargin())
 
 
-                    val fs = generateEmptyFunction(endpoint, "data")
+                    val fs = generateEmptyFunction(endpoint, "finish")
                     statements.map { stmt ->
                         fs.addStatement(stmt)
                     }

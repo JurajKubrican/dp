@@ -279,7 +279,7 @@ class Generator {
                             .build())
                     .build()
 
-            val fs = generateEmptyFunction(endpoint, "view", GetMapping::class)
+            val fs = generateEmptyFunction(endpoint, "", GetMapping::class)
                     .returns(ClassName("sk.knet.dp.relay.$className", returnObjectName))
                     .addStatement("""
                     |     processServerRequest.get("$className",

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+    <!-- TRANSACTIONS -->
+    <!-- ROLES -->
+    <role >
+        <id>user</id>
+        <name>user</name>
+    </role>
+    <role >
+        <id>manager</id>
+        <name>manager</name>
+    </role>
+    <!-- DATA -->
+    <data type="text">
+        <id>text_field</id>
+        <title>text_field</title>
+    </data>
+    <data type="enumeration">
+        <id>enumeration</id>
+        <title>enumeration</title>
+        <values>opt_1</values>
+        <values>opt_2</values>
+        <values>opt_3</values>
+    </data>
+    <!-- TRANSITIONS -->
+    <transition>
+        <id>1</id>
+        <x>300</x>
+        <y>220</y>
+        <label>T1</label>
+        <roleRef>
+            <id>user</id>
+            <logic>
+                <perform>true</perform>
+            </logic>
+        </roleRef>
+        <roleRef>
+            <id>manager</id>
+            <logic>
+                <delegate>true</delegate>
+            </logic>
+        </roleRef>
+    </transition>
+    <!-- PLACES -->
+    <place>
+        <id>2</id>
+        <x>220</x>
+        <y>220</y>
+        <label>P1</label>
+        <tokens>1</tokens>
+        <static>false</static>
+    </place>
+    <place>
+        <id>3</id>
+        <x>380</x>
+        <y>220</y>
+        <label>P2</label>
+        <tokens>0</tokens>
+        <static>false</static>
+    </place>
+    <!-- ARCS -->
+    <arc>
+        <id>4</id>
+        <type>regular</type>
+        <sourceId>2</sourceId>
+        <destinationId>1</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+    <arc>
+        <id>5</id>
+        <type>regular</type>
+        <sourceId>1</sourceId>
+        <destinationId>3</destinationId>
+        <multiplicity>1</multiplicity>
+    </arc>
+
+</document>

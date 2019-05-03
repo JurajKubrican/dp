@@ -262,10 +262,7 @@ class Generator {
 
                     Endpoint(transition.id, RequestMethod.POST, props, roles, transition.label.value)
                 }
-                .filter { transition ->
-                    transition.props.isNotEmpty()
-                }
-
+        
         val result = endpointGET.map { endpoint ->
             val returnObjectName = "get${endpoint.id}Result"
             val returnObjectParams = endpoint.props.map {

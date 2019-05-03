@@ -135,7 +135,7 @@ class Generator {
         return fs
     }
 
-    private fun generateDataFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
+    private fun generateFinishFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
 //        Prep data
         val endpoints = transitions
                 .map { transition ->
@@ -412,55 +412,12 @@ class Generator {
                 }
     }
 
-    private fun generateFinishFunctions(transitions: List<FacadeTransition>, className: String): List<FunSpec> {
-//        Prep data
-        val endpoints = transitions
-                .map { transition ->
-                    val roles = transition.rolesPerform
-                            .map { role ->
-                                "ROLE_${className.toUpperCase()}_${role.toUpperCase()}"
-                            }.toList()
-
-                    Endpoint(transition.id, RequestMethod.POST, emptyList(), roles, transition.label.value)
-                }
-
-        return endpoints
-                .map { endpoint ->
-
-                    val statements = mutableListOf(
-                            """processServerRequest.finish("$className",
-                    |     "${endpoint.id}",
-                    |     instanceId)
-                    |     return ResponseEntity("", OK)""".trimMargin()
-                    )
-
-                    val fs = generateEmptyFunction(endpoint, "finish")
-
-                    statements.map { stmt ->
-                        fs.addStatement(stmt)
-                    }
-
-                    fs.addParameter(ParameterSpec
-                            .builder("userId", String::class)
-                            .addAnnotation(AnnotationSpec
-                                    .builder(RequestParam::class)
-                                    .addMember("value = \"userId\"").build())
-                            .addAnnotation(AnnotationSpec
-                                    .builder(ApiParam::class)
-                                    .addMember("required = true").build())
-                            .build())
-
-                    fs.build()
-                }
-    }
-
     private fun generateClass(
             transitions: List<FacadeTransition>,
             className: String
     ) {
         println("generating class:$className")
         val viewEndpoints = generateViewEndpoints(transitions, className)
-        val dataFunctions = generateDataFunctions(transitions, className)
         val finishFunctions = generateFinishFunctions(transitions, className)
         val assignFunctions = generateAssignFunctions(transitions, className)
         val delegateFunctions = generateDelegateFunctions(transitions, className)
@@ -468,8 +425,7 @@ class Generator {
 
 
         val newClass = TypeSpec.classBuilder(className)
-                .addFunctions(dataFunctions
-                        .union(finishFunctions)
+                .addFunctions(finishFunctions
                         .union(viewEndpoints.first)
                         .union(assignFunctions)
                         .union(delegateFunctions)

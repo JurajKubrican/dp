@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="https://modeler.netgrif.com/petriflow_schema.xsd">
     <!-- TRANSACTIONS -->
     <!-- ROLES -->
-    <role >
+    <role>
         <id>user</id>
         <name>user</name>
     </role>
-    <role >
+    <role>
         <id>manager</id>
         <name>manager</name>
     </role>
@@ -24,7 +25,7 @@
     </data>
     <!-- TRANSITIONS -->
     <transition>
-        <id>1</id>
+        <id>t1</id>
         <x>300</x>
         <y>220</y>
         <label>T1</label>
@@ -40,6 +41,19 @@
                 <delegate>true</delegate>
             </logic>
         </roleRef>
+        <dataRef>
+            <id>text_field</id>
+            <logic>
+                <behavior>editable</behavior>
+            </logic>
+        </dataRef>
+        <dataRef>
+            <id>enumeration</id>
+            <logic>
+                <behavior>editable</behavior>
+                <behavior>required</behavior>
+            </logic>
+        </dataRef>
     </transition>
     <!-- PLACES -->
     <place>

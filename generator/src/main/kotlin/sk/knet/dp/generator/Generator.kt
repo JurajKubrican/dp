@@ -118,7 +118,7 @@ class Generator {
         //Function itself
         val fs = FunSpec.builder("$operation${endpoint.id}")
                 .addAnnotation(AnnotationSpec.builder(type)
-                        .addMember("\"${endpoint.id}/{instanceId}/$operation\"")
+                        .addMember("\"/{instanceId}/${endpoint.id}/$operation\"")
                         .build())
                 .addAnnotation(rolesAnnotation.build())
                 .addAnnotation(descriptionAnnotation.build())
@@ -262,7 +262,7 @@ class Generator {
 
                     Endpoint(transition.id, RequestMethod.POST, props, roles, transition.label.value)
                 }
-        
+
         val result = endpointGET.map { endpoint ->
             val returnObjectName = "get${endpoint.id}Result"
             val returnObjectParams = endpoint.props.map {

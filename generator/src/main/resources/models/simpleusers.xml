@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./users_schema.xsd">
+    <user name="user" password="verySecureUserPass">
+        <role id="user"/>
+    </user>
+    <user name="manager" password="verySecureManagerPass">
+        <role id="manager"/>
+        <role id="user"/>
+    </user>
+</document>

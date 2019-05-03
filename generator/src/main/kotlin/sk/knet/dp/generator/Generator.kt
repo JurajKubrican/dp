@@ -62,7 +62,7 @@ class Generator {
             Regex("^Users.*").matches(it.fileName.toString())
         }.forEach {
             val users = UsersReader(it.toString())
-            registerUsers(users.document.user, it.fileName.toString().substring(4))
+            registerUsers(users.document.user, it.fileName.toString().substring(5))
         }
 
 
@@ -93,6 +93,7 @@ class Generator {
                     }.toString(),
                     StandardCharsets.UTF_8.toString())
             URL("http://localhost:8088/addUser?username=${netId}_${it.name}&password=${it.password}&roles=$roles").readText()
+            print("${netId}_${it.name} - ${it.password} - $roles\"")
         }
 
     }
